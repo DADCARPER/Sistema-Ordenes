@@ -3,6 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { TemplatetopComponent } from '../templatetop/templatetop.component';
 import { TemplatebotComponent } from '../templatebot/templatebot.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-perfil',
@@ -13,27 +14,41 @@ import { TemplatebotComponent } from '../templatebot/templatebot.component';
 })
 export class PerfilComponent implements OnInit {
 
-  private _login = inject(AuthService);
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
+
+  private _http = inject(HttpClient);
+  
 
   ngOnInit(): void {
     //this.sendlogin();
     console.log("hola");
   }
   
-  sendlogin(){
+  onFileSelected(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    if (fileInput.files && fileInput.files.length > 0) {
+      this.selectedFile = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
 
-    // this._login.loginsesion("administracion@prevencionvialintegral.com","123456").subscribe(data =>{
-    //   let dataResponse = data;
-    //   if(dataResponse.status == "ok"){
-    //     localStorage.setItem("token",dataResponse.result.token);
-    //     this.router.navigate(['dashboard']);
-    //   }else{
-    //     this.errorstatus = true;
-    //     this.errormensaje = dataResponse.result.error_msg;
-    //   }
-    //   console.log("iniciosesion correctamente"+dataResponse.status);
-    
-    // });
+  onSubmit(event: Event): void {
+    event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+    if (this.selectedFile) {
+      const formData = new FormData();
+      formData.append('image', this.selectedFile);
+
+      this._http.post('http://localhost/api_ordenes/upload', formData).subscribe(response => {
+        console.log('Image uploaded successfully', response);
+      }, error => {
+        console.error('Error uploading image', error);
+      });
+    }
   }
 
 }

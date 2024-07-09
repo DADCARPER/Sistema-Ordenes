@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+/* IMPORTANTE PARA QUE SE MUESTREN LAS TABLAS */
+/* Core Grid CSS */
+@import 'ag-grid-community/styles/ag-grid.css';
+/* Quartz Theme Specific CSS */
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+
+@import 'tippy.js/dist/tippy.css';
+

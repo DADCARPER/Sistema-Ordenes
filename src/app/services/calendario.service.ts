@@ -6,27 +6,21 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class CalendarioService {
 
   URL = environment.api
 
-  usuariologin: string[] = []; 
-
   private _http= inject(HttpClient);
 
-  loginsesion(correo:string,password:string):Observable<any>{
+  cargaeventos(accion:number,numcalendario:number,micalen:any,token:string):Observable<any>{
     
     const body = {
-      correo,
-      password
+      accion,
+      numcalendario,
+      micalen,
+      token
     }
-    return this._http.post(`${this.URL}/auth`,body)
+    return this._http.post(`${this.URL}/calendario`,body)
 
   }
-
-  datosusuario(usuario: any){
-    this.usuariologin.push(usuario);
-  }
-
-  
 }

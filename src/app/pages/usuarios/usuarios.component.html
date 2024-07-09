@@ -80,26 +80,16 @@
           </ol>
           <div class="card mb-4">
               <div class="card-body">
-                  This page is an example of using the light side navigation option. By appending the
-                  <code>.sb-sidenav-light</code>
-                  class to the
-                  <code>.sb-sidenav</code>
-                  class, the side navigation will take on a light color scheme. The
-                  <code>.sb-sidenav-dark</code>
-                  is also available for a darker option.
-                  <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown button
-                      </button>
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#">Opción 1</a>
-                        <a class="dropdown-item" href="#">Opción 2</a>
-                        <a class="dropdown-item" href="#">Opción 3</a>
-                      </div>
-                    </div>
+                <!-- TABLA DINAMICA-->
+                <ag-grid-angular class="ag-theme-quartz" style="height: 650px;" [rowData]="pacientes" [columnDefs]="colDefs" [pagination]="true"
+                [paginationPageSize]="10" [paginationPageSizeSelector]="[10, 50, 100]" (rowDoubleClicked)="activomodal(myModalContent,$event)">
+            
+                </ag-grid-angular>
+                    
               </div>
           </div>
       </div>
+      
     </main>
 
     <app-templatebot></app-templatebot>
@@ -107,3 +97,241 @@
       
   </div>
 </div>
+
+<!-- Modal -->
+<!-- Modal -->
+<ng-template #myModalContent let-modal>
+
+    <!-- <div class="modal-header">
+      <h4 class="modal-title" id="modal-title"><i class="uil uil-edit"></i> Perfil paciente</h4>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close button"
+        aria-describedby="modal-title"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+    <form [formGroup]="formueditar" (ngSubmit)="guardar()">
+    <div class="modal-body">
+      
+        
+        <div class="row">
+            
+          <div class="col-md-6">
+            
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="nombre" formControlName="nombre" >
+                <div  class="text-danger" *ngIf="formueditar.get('nombre')?.invalid && formueditar.get('nombre')?.touched">
+                  <div *ngIf="this.formueditar.get('nombre')?.hasError('required');">Nombre es requerido.</div>
+                  <div *ngIf="this.formueditar.get('nombre')?.hasError('minlength');">Ingrese un nombre mayor a 6 caracteres.</div>
+                  <div *ngIf="this.formueditar.get('nombre')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="identificacion" class="form-label">Documento identidad</label>
+                <input type="text" class="form-control" id="identificacion" name="identificacion" formControlName="identificacion">
+                <div  class="text-danger" *ngIf="formueditar.get('identificacion')?.invalid && formueditar.get('identificacion')?.touched">
+                  <div *ngIf="this.formueditar.get('identificacion')?.hasError('required');">Numero documento es requerido.</div>
+                  <div *ngIf="this.formueditar.get('identificacion')?.hasError('minlength');">Documento invalido.</div>
+                  <div *ngIf="this.formueditar.get('identificacion')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            
+          </div>
+          <div class="col-md-6">
+          
+              <div class="mb-3">
+                <label for="apellidos" class="form-label">Apellidos completo</label>
+                <input type="text" class="form-control" id="apellidos" formControlName="apellidos" >
+                <div  class="text-danger" *ngIf="formueditar.get('apellidos')?.invalid && formueditar.get('apellidos')?.touched">
+                  <div *ngIf="this.formueditar.get('apellidos')?.hasError('required');">Apellidos son requeridos.</div>
+                  <div *ngIf="this.formueditar.get('apellidos')?.hasError('minlength');">Ingrese un apellido valido.</div>
+                  <div *ngIf="this.formueditar.get('apellidos')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="correo" class="form-label">Correo electronico</label>
+                <input type="mail" class="form-control" id="correo" name="correo" formControlName="correoelectronico">
+                <div  class="text-danger" *ngIf="formueditar.get('correoelectronico')?.invalid && formueditar.get('correoelectronico')?.touched">
+                  <div *ngIf="this.formueditar.get('correoelectronico')?.hasError('required');">Correo obligatorio.</div>
+                  <div *ngIf="this.formueditar.get('correoelectronico')?.hasError('minlength');">Ingrese un correo valido.</div>
+                  <div *ngIf="this.formueditar.get('correoelectronico')?.hasError('maxlength');">Limite excedido.</div>
+                  <div *ngIf="this.formueditar.get('correoelectronico')?.hasError('email');">Correo no valido.</div>
+                </div>
+              </div>
+            
+          </div>
+          <div class="col-md-6">
+          
+            <div class="mb-3">
+              <label for="direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="direccion" formControlName="direccion" >
+              <div  class="text-danger" *ngIf="formueditar.get('direccion')?.invalid && formueditar.get('direccion')?.touched">
+                
+                <div *ngIf="this.formueditar.get('direccion')?.hasError('minlength');">Ingrese un apellido valido.</div>
+                <div *ngIf="this.formueditar.get('direccion')?.hasError('maxlength');">Limite excedido.</div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="ciudad" class="form-label">Ciudad</label>
+              <input type="mail" class="form-control" id="ciudad" name="ciudad" formControlName="ciudad">
+              <div  class="text-danger" *ngIf="formueditar.get('ciudad')?.invalid && formueditar.get('ciudad')?.touched">
+                
+                <div *ngIf="this.formueditar.get('ciudad')?.hasError('minlength');">Ingrese un correo valido.</div>
+                <div *ngIf="this.formueditar.get('ciudad')?.hasError('maxlength');">Limite excedido.</div>
+              </div>
+            </div>
+          
+        
+          </div>
+          <div class="col-md-6">
+          
+            <div class="mb-3">
+              <label for="telefono" class="form-label">No. Telefónico</label>
+              <input type="text" class="form-control" id="telefono" formControlName="telefono" >
+              <div  class="text-danger" *ngIf="formueditar.get('telefono')?.invalid && formueditar.get('telefono')?.touched">
+                
+                <div *ngIf="this.formueditar.get('telefono')?.hasError('minlength');">Ingrese un apellido valido.</div>
+                <div *ngIf="this.formueditar.get('telefono')?.hasError('maxlength');">Limite excedido.</div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="genero" class="form-label">Género</label>
+                <select class="form-select" id="genero" formControlName="genero">
+                  <option value="F">Femenino</option>
+                  <option value="M">Masculino</option>
+                </select>
+                <div  class="text-danger" *ngIf="formueditar.get('genero')?.invalid && formueditar.get('genero')?.touched">
+                  <div *ngIf="this.formueditar.get('genero')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('genero')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+            </div>
+          
+        
+          </div>
+          
+        </div>
+  
+        <div class="row">
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="fnacimiento" class="form-label">Fecha Nacimiento</label>
+                <input type="date" class="form-control" id="fnacimiento" formControlName="fnacimiento" >
+                <div  class="text-danger" *ngIf="formueditar.get('fnacimiento')?.invalid && formueditar.get('fnacimiento')?.touched">
+                  <div *ngIf="this.formueditar.get('fnacimiento')?.hasError('required');">Fecha de nacimiento requerido.</div>
+                  <div *ngIf="this.formueditar.get('fnacimiento')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('fnacimiento')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="escolaridad" class="form-label">Escolaridad</label>
+                <select class="form-select" id="escolaridad" formControlName="escolaridad">
+                  <option value="1">Primaria</option>
+                  <option value="2">Bachillerato</option>
+                  <option value="3">Tecnico</option>
+                  <option value="4">Tecnologo</option>
+                  <option value="5">Profesional</option>
+                  <option value="6">Especializacion</option>
+                </select>
+                <div  class="text-danger" *ngIf="formueditar.get('escolaridad')?.invalid && formueditar.get('escolaridad')?.touched">
+                  <div *ngIf="this.formueditar.get('escolaridad')?.hasError('required');">Escolaridad es requerido.</div>
+                  <div *ngIf="this.formueditar.get('escolaridad')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('escolaridad')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="lateralidad" class="form-label">Lateralidad</label>
+                <select class="form-select" id="lateralidad" formControlName="lateralidad">
+                  <option value="1">Izquierda</option>
+                  <option value="2">Derecha</option>
+                </select>
+                <div  class="text-danger" *ngIf="formueditar.get('lateralidad')?.invalid && formueditar.get('lateralidad')?.touched">
+                  <div *ngIf="this.formueditar.get('lateralidad')?.hasError('required');">nombre es requerido.</div>
+                  <div *ngIf="this.formueditar.get('lateralidad')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('lateralidad')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="accidentes" class="form-label">No. accidentes</label>
+                <input type="number" min="0" class="form-control" id="accidentes" formControlName="accidentes" >
+                <div  class="text-danger" *ngIf="formueditar.get('accidentes')?.invalid && formueditar.get('accidentes')?.touched">
+                  <div *ngIf="this.formueditar.get('accidentes')?.hasError('required');">0 valor minimo.</div>
+                  <div *ngIf="this.formueditar.get('accidentes')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('accidentes')?.hasError('maxlength');">Valor no valido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="gravedad" class="form-label">Gravedad</label>
+                <select class="form-select" id="gravedad" formControlName="gravedad">
+                  <option value="0">N/A</option>
+                  <option value="1">Solo daños</option>
+                  <option value="2">Con lesionados</option>
+                  <option value="3">Con fallecidos</option>
+                </select>
+                <div  class="text-danger" *ngIf="formueditar.get('gravedad')?.invalid && formueditar.get('gravedad')?.touched">
+                  <div *ngIf="this.formueditar.get('gravedad')?.hasError('minlength');">Ingrese un valor valido.</div>
+                  <div *ngIf="this.formueditar.get('gravedad')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="col-md-2">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="edad" class="form-label">Edad</label>
+                <input type="mail" class="form-control" id="edad" name="edad" formControlName="edad">
+                <div  class="text-danger" *ngIf="formueditar.get('edad')?.invalid && formueditar.get('edad')?.touched">
+                  
+                  <div *ngIf="this.formueditar.get('edad')?.hasError('minlength');">Ingrese un correo valido.</div>
+                  <div *ngIf="this.formueditar.get('edad')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          
+        </div>
+  
+        <div class="row">
+          <div class="col-md-12">
+            <main class="px-3">
+              <div class="mb-3">
+                <label for="antecedentes" class="form-label">Antecedentes</label>
+                <textarea class="form-control" id="antecedentes" rows="4" formControlName="antecedentes"></textarea>
+                <div  class="text-danger" *ngIf="formueditar.get('antecedentes')?.invalid && formueditar.get('antecedentes')?.touched">
+                  <div *ngIf="this.formueditar.get('antecedentes')?.hasError('maxlength');">Limite excedido.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+          
+        </div>
+  
+    </div>
+    <div class="modal-footer">
+      
+      <button type="button" ngbAutofocus class="btn btn-outline-info" (click)="activomodal3(modal3)">Ver Resultados</button>
+      <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="activomodal2(modal2)">Muestra Link</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+      <button type="button" ngbAutofocus class="btn btn-primary" (click)="modal.close(guardar())">Ok</button>
+    </div>
+    </form> -->
+  </ng-template>

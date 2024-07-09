@@ -6,27 +6,20 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class UsuariosService {
 
   URL = environment.api
 
-  usuariologin: string[] = []; 
-
   private _http= inject(HttpClient);
 
-  loginsesion(correo:string,password:string):Observable<any>{
+  cargausuarios(accion:number,token:string):Observable<any>{
     
     const body = {
-      correo,
-      password
+      accion,
+      token
     }
-    return this._http.post(`${this.URL}/auth`,body)
+    return this._http.post(`${this.URL}/usuarios`,body)
 
   }
 
-  datosusuario(usuario: any){
-    this.usuariologin.push(usuario);
-  }
-
-  
 }

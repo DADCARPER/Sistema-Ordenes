@@ -3,11 +3,12 @@ import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angula
 
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -15,7 +16,7 @@ export class LoginComponent implements OnInit {
 
   errorstatus:boolean = false;
   errormensaje:string = '';
-
+  
   
   private _authservice = inject(AuthService);
   private _router = inject(Router);
@@ -37,8 +38,8 @@ export class LoginComponent implements OnInit {
   }
 
   revisartokenenbase(){
-    if(localStorage.getItem("token")){
-      this._router.navigate(['dashboard']);
+    if(sessionStorage.getItem("tk")){
+      this._router.navigate(['usuarios']);
     }
   }
 
@@ -57,14 +58,19 @@ export class LoginComponent implements OnInit {
       //console.log(datosFormulario);
       this._authservice.loginsesion(this.formuloguin.value.correoelectronico ?? '',this.formuloguin.value.contrasena ?? '').subscribe(data =>{
         let dataResponse = data;
-        if(dataResponse.status == "oko"){
-          localStorage.setItem("token",dataResponse.result.token);
+        console.log(data);
+        if(dataResponse.status == "ok"){
+          sessionStorage.setItem("tk",dataResponse.result.token);
+          sessionStorage.setItem("rol",dataResponse.result.rol);
+          sessionStorage.setItem("us",dataResponse.result.id);
+
           this._router.navigate(['dashboard']);
         }else{
+          
           this.errorstatus = true;
           this.errormensaje = dataResponse.result.error_msg;
         }
-        //console.log(data);
+        
       })
       
 
