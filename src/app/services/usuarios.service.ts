@@ -12,7 +12,7 @@ export class UsuariosService {
 
   private _http= inject(HttpClient);
 
-  cargausuarios(accion:number,token:string):Observable<any>{
+  cargausuarios(accion:number,token:any):Observable<any>{
     
     const body = {
       accion,

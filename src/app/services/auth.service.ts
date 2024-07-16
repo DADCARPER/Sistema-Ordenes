@@ -10,8 +10,6 @@ export class AuthService {
 
   URL = environment.api
 
-  usuariologin: string[] = []; 
-
   private _http= inject(HttpClient);
 
   loginsesion(correo:string,password:string):Observable<any>{
@@ -22,10 +20,6 @@ export class AuthService {
     }
     return this._http.post(`${this.URL}/auth`,body)
 
-  }
-
-  datosusuario(usuario: any){
-    this.usuariologin.push(usuario);
   }
 
   

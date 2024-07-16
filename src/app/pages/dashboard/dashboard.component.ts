@@ -1,19 +1,21 @@
 import { Component, ViewChild, TemplateRef, ViewContainerRef, OnInit, inject } from '@angular/core';
 import { TemplatetopComponent } from '../templatetop/templatetop.component';
 import { TemplatebotComponent } from '../templatebot/templatebot.component';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { NgbModal, NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModule, NgbTooltipModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import tippy, { Instance } from 'tippy.js';
 import { CalendarioService } from '../../services/calendario.service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { an } from '@fullcalendar/core/internal-common';
+import { Router } from '@angular/router';
+import { UsuariosService } from '../../services/usuarios.service';
 
 
 @Component({
@@ -25,10 +27,23 @@ import { an } from '@fullcalendar/core/internal-common';
 })
 export class DashboardComponent implements OnInit {
 
+  @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent;
+
+  //modals
+  modal0?: NgbModalRef;
+  @ViewChild('modal1') modal1!: TemplateRef<any>; // Referencia al template del modal
+  modal2?: NgbModalRef;
+  modal3?: NgbModalRef;
+  @ViewChild('modal4') modal4!: TemplateRef<any>; // Referencia al template del modal
+  modal5?: NgbModalRef;
 
   lastClicked: number = 0;
   events: any;
+  eventoactualdioclic: any;
 
+  creareventoactualdioclic: any;
+
+  idevento:any;
   tituloevento: any;
   startevento: any;
   starmilitar: any;
@@ -43,13 +58,23 @@ export class DashboardComponent implements OnInit {
 
   tippyreloj: any;
 
- 
+  nombrelogueado: any;
+  roll:any;
+  pacientes:any;
 
-  @ViewChild('modal1') modal1!: TemplateRef<any>; // Referencia al template del modal
+ 
+  lastClickTime:any;
+
+  vistatotal: string = 'no';
+  
 
   private _calendario = inject(CalendarioService);
   private _serviciomodal = inject(NgbModal);
   private _formbuilder = inject(FormBuilder);
+  private _router = inject(Router);
+  private _usuarios = inject(UsuariosService);
+
+
 
 
   //Formulario editar
@@ -68,7 +93,7 @@ export class DashboardComponent implements OnInit {
     boderColor: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
     allDay: ['',[Validators.maxLength(1),Validators.minLength(1)]]
 
-  })
+  });
 
 
   
@@ -84,13 +109,14 @@ export class DashboardComponent implements OnInit {
   //   { title: 'Visita de campo2', start: '2024-07-21T15:00:00', end: '2024-07-22T15:00:00',backgroundColor: 'purple', borderColor: 'purple', description: 'Descripción Orden 85325 con todo los datos puesto como telefono y mucho mas', userId: 'DAVID CARVAJAL PERNETT' }
   // ];
 
-  cargareventos(){
-    let token = "d9f495f93f200f5be8c002eb4c9b22ba";
-    this._calendario.cargaeventos(1,1,1,token).subscribe((events: any[]) => {
+  cargareventos(accion:any,numcalendar:any,idusuario:any,token:any){
+    //let token = "d9f495f93f200f5be8c002eb4c9b22ba";
+    this._calendario.cargaeventos(accion,numcalendar,idusuario,token).subscribe((events: any[]) => {
       console.log(events);
       
       this.calendarOptions.events = (events || []).map(event => {
         const mappedEvent = {
+          id: event.id,
           title: event.title,
           start: event.start,
           end: event.allDay === '1' || !event.end ? null : event.end, // Si es allDay o end no está presente, se asigna null
@@ -104,7 +130,7 @@ export class DashboardComponent implements OnInit {
         };
   
         // Log para ver el valor de allDay después de la conversión
-        console.log(`Event: ${mappedEvent.start}, All Day: ${mappedEvent.allDay}`);
+        console.log(`Event: ${mappedEvent.userId}, All Day: ${mappedEvent.asignado}`);
   
         return mappedEvent;
       });
@@ -158,7 +184,7 @@ export class DashboardComponent implements OnInit {
 
     locale: esLocale, // Configura el idioma del calendario a español
     dateClick: (arg) => this.handleDateClick(arg),// Manejador de clics en la fecha
-    eventClick: (info) => this.handleEventClick(info), // Manejador de clics en eventos
+    eventClick: (info) => this.handleEventClick(info,this.modal1), // Manejador de clics en eventos
     //eventContent: (arg) => this.renderEventContent(arg), // Manejador para personalizar contenido del evento
 
     eventMouseEnter: this.handleEventMouseEnter.bind(this),
@@ -167,19 +193,87 @@ export class DashboardComponent implements OnInit {
   };
 
   handleDateClick(arg:any) {
-    alert('date click! ' + arg.dateStr)
+
+    // console.log('Fecha clicada:', arg.date); //Fri Jul 12 2024 00:00:00 GMT-0500 (hora estándar de Colombia)
+    // console.log('Fecha clicada (ISO):', arg.dateStr); //2024-07-12
+    // console.log('Es todo el día:', arg.allDay); //true
+    // console.log('Elemento DOM:', arg.dayEl);// html del cuadro
+    // console.log('Evento JS:', arg.jsEvent); // eventos
+    // console.log('Vista:', arg.view); // vista de dode se da clic
+    // if (arg.resource) {
+    //   console.log('Recurso:', arg.resource);
+    // }
+    // if (arg.seg) {
+    //   console.log('Segmento:', arg.seg);
+    // }
+
+    const currentTime = new Date().getTime();
+    const timeDiff = currentTime - this.lastClickTime;
+
+    if (timeDiff < 300 && timeDiff > 0) {
+      // Doble clic detectado
+      //this.handleDateDoubleClick(arg);
+      //alert('date click! ' + arg.dateStr); // muestra la fecha que se dio clic. DATO IMPORTANTE!
+      this.creareventoactualdioclic = arg;
+      this.formueditar.reset();// importante resetear las advertencias.
+      this.formueditar.patchValue({ // limpio el formulario para crear un nuevo evento
+
+        'titulo':"",
+        'finicial':arg.dateStr,
+        'ffinal':arg.dateStr,
+        'hinicial':"08:00",
+        'hfinal':"18:00",
+        'descripcion':"",
+        'nombrecompleto': this.usuarioevento
+  
+      });
+      this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true });
+
+    } else {
+      // Actualizar el tiempo del último clic
+      this.lastClickTime = currentTime;
+    }
+    
   }
 
   ngOnInit(){
+
+    // valido que usuario existe y verifico roll
+    if(sessionStorage.getItem("tk") && sessionStorage.getItem("us") && sessionStorage.getItem("rl") ){
+
+      this.roll = sessionStorage.getItem("rl");
+
+      //this._router.navigate(['usuarios']);
+      this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk")); ///SI PONGO ID USUARIO MUESTRA LO DEL USUARIO SI PONGO "SI" MUESTRA TODO
+      
+      //llamos todos los usuarios registrados
+      this._usuarios.cargausuarios(1,sessionStorage.getItem("tk")).subscribe(data=>{
+        
+        data.sort((a:any, b:any) => a.nombrecompleto.localeCompare(b.nombrecompleto)); //ordeno el array por nombre A-Z campo llamado nombrecompleto.
+
+        this.formueditar.get("nombreasignador")?.setValue(sessionStorage.getItem("us"));
+
+        console.log(data);
+
+        this.pacientes= data;
+      
+      });
+
+    }else{
+      this.logout();
+    }
     
-    this.cargareventos();
+    
     // tippy('.fc-event fc-event-start fc-event-end fc-event-past fc-daygrid-event fc-daygrid-dot-event', {
     //   content: "I'm a Tippy tooltip!",
     // });
   }
 
-  handleEventClick(info: any) {
-    
+  handleEventClick(info: any,content: TemplateRef<any>) {
+
+    this.eventoactualdioclic = info.event;
+
+    this.idevento = info.event.id;
     this.tituloevento = info.event.title;
     this.startevento = this.formatTime(info.event.start);
     this.endevento = info.event.end ? this.formatTime(info.event.end) : 'Sin hora de fin'; // Manejo de evento sin hora de fin
@@ -193,8 +287,9 @@ export class DashboardComponent implements OnInit {
     this.todoeldia = info.event.allDay;
     console.log("todo el dia :"+this.fechainicial);
 
+    this.modal0 = this._serviciomodal.open(content,{ centered: true });
     //alert(`Evento: ${info.event.title}\nDescripción: ${info.event.extendedProps.description}`);
-    this.activomodal1(this.modal1);
+    //this.activomodal1(this.modal1,info);
     
   }
 
@@ -243,7 +338,7 @@ export class DashboardComponent implements OnInit {
   }
 
   addEvent() {
-    this.cargareventos();
+    this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
   }
 
   /////////////////////
@@ -324,12 +419,12 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  activomodal1(content:any){
+  activomodal1(content:any,info:any){
   
-    let urlbase = "https://test-ctp.prevencionvialintegral.com/ctp?dni=";
+
     this._serviciomodal.open(content,{ centered: true });
 
-    console.log(this.todoeldia);
+    console.log(info.event.title);
     // this.tituloevento = info.event.title;
     // this.startevento = this.formatTime(info.event.start);
     // this.endevento = this.formatTime(info.event.end);
@@ -341,8 +436,6 @@ export class DashboardComponent implements OnInit {
   }
 
   activomodal2(content:any){
-  
-    let urlbase = "https://test-ctp.prevencionvialintegral.com/ctp?dni=";
 
     this.formueditar.patchValue({
 
@@ -353,20 +446,120 @@ export class DashboardComponent implements OnInit {
       'hfinal': this.endmilitar,
       'descripcion': this.descripcionevento,
       'nombrecompleto': this.usuarioevento,
-      'nombreasignador': this.quienasigno,
+      'nombreasignador': sessionStorage.getItem("us"),
       'backgroundColor': this.tituloevento,
       'allDay': this.quienasigno
 
     })
 
     
-    this._serviciomodal.open(content,{ centered: true });
+    this.modal2 = this._serviciomodal.open(content,{ centered: true });
 
   }
 
-  guardar(){
+  logout():void{
+
+    sessionStorage.clear();
+    this._router.navigate(['login']);
 
   }
   
+  guardar(){
+    this._calendario.editarevento(2,1,this.idevento,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,this.formueditar.value.descripcion,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+      console.log(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
+    });
+
+    this.eventoactualdioclic.setProp('title', this.formueditar.value.titulo);
+    this.eventoactualdioclic.setStart(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
+    this.eventoactualdioclic.setEnd(this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00');
+    this.eventoactualdioclic.setExtendedProp('description', this.formueditar.value.descripcion);
+
+    this.modal2?.dismiss();
+    this.modal0?.dismiss();
+
+
+  }
+
+  eliminarevento(content:any){
+    
+    this.modal3 = this._serviciomodal.open(content, { size: 'sm', centered: true });
+
+    
+  }
+  
+  sieliminaevento(){
+    this._calendario.eliminarevento(4,1,this.idevento,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+      console.log(events);
+    });
+    this.eventoactualdioclic.remove();
+    this.modal3?.dismiss();
+    this.modal2?.dismiss();
+    this.modal0?.dismiss();
+  
+  }
+
+  crear(){
+
+    let color:any;
+    let usuarioID: any;
+    let usuarioIDasignado: any;
+    let bordecolor: any;
+    let colorfondo: any;
+
+    console.log(this.formueditar.value.nombreasignador);
+    if(this.formueditar.value.nombreasignador != null ){
+
+      usuarioID = this.formueditar.value.nombreasignador;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+      usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+      color = "#fac307";
+      bordecolor = "#fac307";
+      colorfondo = "#fac307";
+
+    }else{
+      usuarioID = sessionStorage.getItem("us");
+      usuarioIDasignado = this.formueditar.value.nombreasignador;
+      color = sessionStorage.getItem("cl");
+      bordecolor = sessionStorage.getItem("cl");
+      colorfondo = sessionStorage.getItem("cl");
+
+    }
+
+    this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+      //console.log(events);
+    });
+
+    const calendarApi = this.calendarComponent.getApi();
+
+    calendarApi.addEvent({
+      title: this.formueditar.value.titulo!,
+      start: this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00',
+      end: this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00',
+      extendedProps: {
+        description: this.formueditar.value.descripcion
+      },
+      borderColor: bordecolor, 
+      backgroundColor: colorfondo 
+    });
+    this.modal5?.dismiss();
+      
+
+  }
+
+  toggleVista(): void {
+    //this.vistatotal = this.vistatotal === 'no' ? 'si' : 'no';
+    console.log(this.vistatotal);
+    
+      if (this.vistatotal === 'no'){
+        this.vistatotal = "si";
+        this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
+        
+      }else{
+        this.vistatotal = "no";
+        this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
+      }
+
+    }
+    
+
 
 }

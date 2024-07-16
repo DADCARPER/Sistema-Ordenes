@@ -61,8 +61,9 @@ export class LoginComponent implements OnInit {
         console.log(data);
         if(dataResponse.status == "ok"){
           sessionStorage.setItem("tk",dataResponse.result.token);
-          sessionStorage.setItem("rol",dataResponse.result.rol);
+          sessionStorage.setItem("rl",dataResponse.result.rol);
           sessionStorage.setItem("us",dataResponse.result.id);
+          sessionStorage.setItem("cl",dataResponse.result.colores);
 
           this._router.navigate(['dashboard']);
         }else{

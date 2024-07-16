@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-templatetop',
@@ -8,5 +9,14 @@ import { Component } from '@angular/core';
   styleUrl: './templatetop.component.css'
 })
 export class TemplatetopComponent {
+
+  private _router = inject(Router);
+
+  logout():void{
+
+    sessionStorage.clear();
+    this._router.navigate(['login']);
+
+  }
 
 }
