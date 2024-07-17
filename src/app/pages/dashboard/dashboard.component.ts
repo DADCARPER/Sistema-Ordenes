@@ -42,6 +42,7 @@ export class DashboardComponent implements OnInit {
   eventoactualdioclic: any;
 
   creareventoactualdioclic: any;
+  nombrequiencrea: any;
 
   idevento:any;
   tituloevento: any;
@@ -58,7 +59,7 @@ export class DashboardComponent implements OnInit {
 
   tippyreloj: any;
 
-  nombrelogueado: any;
+  idlogueado: any;
   roll:any;
   pacientes:any;
 
@@ -129,6 +130,8 @@ export class DashboardComponent implements OnInit {
           display: 'auto'
         };
   
+        this.nombrequiencrea = mappedEvent.userId; //asigno el nombre para usarlo al momento de crear un evento
+
         // Log para ver el valor de allDay después de la conversión
         console.log(`Event: ${mappedEvent.userId}, All Day: ${mappedEvent.asignado}`);
   
@@ -227,6 +230,7 @@ export class DashboardComponent implements OnInit {
         'nombrecompleto': this.usuarioevento
   
       });
+      this.formueditar.get("nombreasignador")?.setValue("0");
       this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true });
 
     } else {
@@ -242,6 +246,7 @@ export class DashboardComponent implements OnInit {
     if(sessionStorage.getItem("tk") && sessionStorage.getItem("us") && sessionStorage.getItem("rl") ){
 
       this.roll = sessionStorage.getItem("rl");
+      this.idlogueado = sessionStorage.getItem("us");
 
       //this._router.navigate(['usuarios']);
       this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk")); ///SI PONGO ID USUARIO MUESTRA LO DEL USUARIO SI PONGO "SI" MUESTRA TODO
@@ -285,7 +290,7 @@ export class DashboardComponent implements OnInit {
     this.usuarioevento = info.event.extendedProps.userId;
     this.quienasigno = info.event.extendedProps.asignado;
     this.todoeldia = info.event.allDay;
-    console.log("todo el dia :"+this.fechainicial);
+    console.log("todo el dia :"+this.usuarioevento);
 
     this.modal0 = this._serviciomodal.open(content,{ centered: true });
     //alert(`Evento: ${info.event.title}\nDescripción: ${info.event.extendedProps.description}`);
@@ -505,9 +510,28 @@ export class DashboardComponent implements OnInit {
     let usuarioIDasignado: any;
     let bordecolor: any;
     let colorfondo: any;
+    
 
-    console.log(this.formueditar.value.nombreasignador);
-    if(this.formueditar.value.nombreasignador != null ){
+    // console.log("halassssssssssssssssssss "+typeof this.formueditar.value.nombreasignador);
+    // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
+    if(this.formueditar.value.nombreasignador == "0" || this.formueditar.value.nombreasignador === sessionStorage.getItem("us") ){
+
+      usuarioID = sessionStorage.getItem("us");
+      usuarioIDasignado = ""; //si valor es 0 id es igual al de la sesion el campo debe ir vacio
+      color = sessionStorage.getItem("cl");
+      bordecolor = sessionStorage.getItem("cl");
+      colorfondo = sessionStorage.getItem("cl");
+
+    }else if(this.formueditar.value.nombreasignador == ""){ /// la peticion de crear viene de un suario sin rol de administrador crea evento en su propio calendario
+      
+      
+      usuarioID = sessionStorage.getItem("us");  
+      usuarioIDasignado = this.formueditar.value.nombreasignador;   
+      color = "#fac307";
+      bordecolor = "#fac307";
+      colorfondo = "#fac307";
+
+    }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
 
       usuarioID = this.formueditar.value.nombreasignador;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
       usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
@@ -515,12 +539,6 @@ export class DashboardComponent implements OnInit {
       bordecolor = "#fac307";
       colorfondo = "#fac307";
 
-    }else{
-      usuarioID = sessionStorage.getItem("us");
-      usuarioIDasignado = this.formueditar.value.nombreasignador;
-      color = sessionStorage.getItem("cl");
-      bordecolor = sessionStorage.getItem("cl");
-      colorfondo = sessionStorage.getItem("cl");
 
     }
 
@@ -535,11 +553,21 @@ export class DashboardComponent implements OnInit {
       start: this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00',
       end: this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00',
       extendedProps: {
-        description: this.formueditar.value.descripcion
+        description: this.formueditar.value.descripcion,
+        userId: this.nombrequiencrea
       },
       borderColor: bordecolor, 
       backgroundColor: colorfondo 
     });
+
+
+
+    if (this.vistatotal === 'no'){
+      this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
+    }else{
+      this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
+    }
+
     this.modal5?.dismiss();
       
 

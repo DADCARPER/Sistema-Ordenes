@@ -4,12 +4,12 @@
       <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
           <div class="sb-sidenav-menu">
               <div class="nav">
-                  <div class="sb-sidenav-menu-heading">Core</div>
-                  <a class="nav-link" href="index.html">
-                      <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                      Dashboard
+                  <div class="sb-sidenav-menu-heading">Principal</div>
+                  <a class="nav-link" href="dashboard">
+                      <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                      Calendario principal
                   </a>
-                  <div class="sb-sidenav-menu-heading">Interface</div>
+                  <!-- <div class="sb-sidenav-menu-heading">MEDIA</div>
                   <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                       <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                       Layouts
@@ -52,7 +52,7 @@
                           </div>
                       </nav>
                   </div>
-                  <div class="sb-sidenav-menu-heading">Addons</div>
+                  <div class="sb-sidenav-menu-heading">FINAL</div>
                   <a class="nav-link" href="charts.html">
                       <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                       Charts
@@ -60,7 +60,7 @@
                   <a class="nav-link" href="tables.html">
                       <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                       Tables
-                  </a>
+                  </a> -->
               </div>
           </div>
           <div class="sb-sidenav-footer">
@@ -73,15 +73,15 @@
 
     <main>
       <div class="container-fluid px-4">
-          <h1 class="mt-4">Dashboard</h1>
+          <h1 class="mt-4">Calendario principal</h1>
           <ol class="breadcrumb mb-4">
-              <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-              <li class="breadcrumb-item active">Sidenav Light</li>
+              <li class="breadcrumb-item"><a href="dashboard">Calendario</a></li>
+              <li class="breadcrumb-item active">Principal</li>
           </ol>
           <div class="card mb-4">
               <div class="card-body">
                   
-                <div class="form-check form-switch">
+                <div *ngIf="roll == 1" class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" (change)="toggleVista()">
                     <label class="form-check-label" for="flexSwitchCheckDefault">{{ vistatotal }}</label>
                 </div>
@@ -128,8 +128,8 @@
         <div *ngIf="quienasigno != null"><h6><i class="fas fa-user-friends fa-fw"></i> {{quienasigno}}</h6></div>
 	</div>
 	<div class="modal-footer">
-        <div *ngIf="quienasigno == null">
-            <button type="button" ngbAutofocus class="btn btn-outline-info" (click)="activomodal2(modal2)">Editar</button>
+        <div *ngIf="quienasigno == null || roll == 1">
+            <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="activomodal2(modal2)">Editar</button>
         </div>
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">Cerrar</button>
 	</div>
@@ -336,7 +336,7 @@
 	<div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="eliminarevento(modal3)">Eliminar</button>
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">Cancelar</button>
-        <button type="button" ngbAutofocus class="btn btn-outline-info" (click)="guardar()">Guardar</button>
+        <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="guardar()">Guardar</button>
 	</div>
     </form>
 </ng-template>
@@ -348,12 +348,12 @@
 	</div>
 	<div class="modal-body">
 		
-        <p>¿Seguro desea eliminar este evento?.{{idevento}}</p>
+        <p>¿Seguro desea eliminar este evento?.</p>
         
 	</div>
 	<div class="modal-footer">
         <div *ngIf="quienasigno == null">
-            <button type="button" ngbAutofocus class="btn btn-outline-info" (click)="sieliminaevento()">Si</button>
+            <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="sieliminaevento()">Si</button>
         </div>
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">No</button>
 	</div>
@@ -544,6 +544,7 @@
                 <div class="flex-grow-1" style="margin-left: 10px;">
                     <label for="nombreasignador" class="form-label">Asignar a :</label>
                     <select class="form-select" id="nombreasignador" formControlName="nombreasignador">
+                    <option value="0" selected>Selecciona un usuario</option>
                     <option *ngFor="let paciente of pacientes" [value]="paciente.usuarioid">
                         {{ paciente.nombrecompleto }} {{ paciente.apellidocompleto }}
                     </option>
@@ -558,7 +559,7 @@
 	    
 	<div class="modal-footer">
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">Cancelar</button>
-        <button type="button" ngbAutofocus class="btn btn-outline-info" (click)="crear()">Crear</button>
+        <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="crear()">Crear</button>
 	</div>
     </form>
 </ng-template>
