@@ -1,3 +1,3 @@
 export const environment = {
-    api:'http://localhost/api_ordenes'
+    api:'http://apisistema.prevencionvialintegral.com'
 };

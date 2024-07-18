@@ -6,3 +6,61 @@
 
 @import 'tippy.js/dist/tippy.css';
 
+/* Cambiar el color de los días de la semana, capitalizar la primera letra y quitar el subrayado */
+.fc .fc-col-header-cell-cushion {
+    color: #2c3e50; /* Cambia el color a rojo */
+    text-transform: capitalize; /* Capitaliza la primera letra */
+    text-decoration: none; /* Quita el subrayado */
+    font-weight: normal;
+  }
+  
+  /* Quitar el subrayado de los números de los días y cambiar el color */
+  .fc .fc-daygrid-day-number {
+    color: #2c3e50; /* Cambia el color a azul */
+    text-decoration: none; /* Quita el subrayado */
+  }
+  
+  /* Cambiar el tamaño de la fuente del título del calendario */
+.fc .fc-toolbar-title {
+    font-size: 24px; /* Ajusta este valor según el tamaño de fuente que desees */
+    /*font-weight: bold; /* Puedes añadir esto para negrita o eliminarlo para texto normal */
+    text-transform: uppercase; /* Todo en mayuscula */
+  }
+
+  /* Ajustar el ancho de la columna de "Todo el día" */
+.fc .fc-timegrid-axis-cushion {
+  max-width: none; /* Ajusta el texto en vista dia. donde dice "todo el dia" */
+}
+
+/*--------------------------------------------------------------*/
+
+/* Cambiar el color de fondo de la celda seleccionada */
+.fc-daygrid-day.fc-day-today {
+  background-color: #c5dbed !important; /* Cambia esto al color que prefieras */
+}
+
+/* Resaltar los bordes de la celda seleccionada */
+.fc-daygrid-day.fc-day-today {
+  border: 1.5px solid #81add2 !important; /* Cambia esto al color que prefieras */
+}
+
+/* Cambiar el color de fondo del día seleccionado en la vista semanal */
+.fc-timegrid-col.fc-day-today {
+  background-color: #c5dbed !important; /* Cambia esto al color que prefieras */
+}
+
+/* Resaltar los bordes del día seleccionado en la vista semanal */
+.fc-timegrid-col.fc-day-today {
+  border: 1.5px solid #81add2 !important; /* Cambia esto al color que prefieras */
+}
+
+/* Cambiar el color de fondo de las celdas de los domingos en la vista mensual */
+.fc-daygrid-day.fc-day-sun {
+  background-color: #f8f9fa !important; /* Cambia esto al color que prefieras */
+}
+
+/* Resaltar los bordes de las celdas de los domingos en la vista mensual */
+/* .fc-daygrid-day.fc-day-sun {
+  border: 2px solid #f8f9fa !important;
+} 
+*/ 

@@ -146,13 +146,20 @@ export class DashboardComponent implements OnInit {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
     
     headerToolbar: {
-      left: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+      left: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
       center: 'title',
       right: 'today prev,next'
     },
+
+    footerToolbar: {
+        //left: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth,listWeek,listDay' // Añade tus botones personalizados aquí
+    },
     
     events: [], // Usar la propiedad events del componente
-    height: 'auto',
+
+    aspectRatio: 1.5, // Relación de aspecto
+    height: 'auto', // Altura automática para ser responsivo
+
     themeSystem: 'bootstrap',  // Usando el tema de Bootstrap
     navLinks: true,  // Habilitar los enlaces de navegación
     dayHeaderFormat: { weekday: 'long' }, // Mostrar días de la semana completos
@@ -281,7 +288,7 @@ export class DashboardComponent implements OnInit {
     this.idevento = info.event.id;
     this.tituloevento = info.event.title;
     this.startevento = this.formatTime(info.event.start);
-    this.endevento = info.event.end ? this.formatTime(info.event.end) : 'Sin hora de fin'; // Manejo de evento sin hora de fin
+    this.endevento = info.event.end ? this.formatTime(info.event.end) : '11:59 p.m.'; // Manejo de evento sin hora de fin
     this.starmilitar = this.formatTime2(info.event.start);
     this.endmilitar = info.event.end ? this.formatTime2(info.event.end) : 'Sin hora de fin'; // Manejo de evento sin hora de fin
     this.fechainicial = this.formatDate(info.event.start);
@@ -379,7 +386,7 @@ export class DashboardComponent implements OnInit {
         <p><i class="fa-solid fa-bars-staggered"> </i> ${info.event.extendedProps.description}</p>
         
         <hr>
-        <div style="margin: 10px 0 10px 0;"><i class="fas fa-user fa-fw"></i> ${info.event.extendedProps.userId}</div>
+        <div style="margin: 10px 0 10px 0;"><i class="fas fa-user fa-fw"></i> ${info.event.extendedProps.userId == null ? 'Día festivo' : info.event.extendedProps.userId}</div>
       `,
       maxWidth: 500,
       allowHTML: true,

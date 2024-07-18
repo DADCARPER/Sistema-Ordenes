@@ -96,7 +96,6 @@
                     </full-calendar>
                 </div>
 
-
               </div>
           </div>
       </div>
@@ -116,20 +115,27 @@
 	<div class="modal-body">
 		<h6> <i class="fa-regular fa-clock"></i> De : {{startevento}} Hasta : {{endevento}} </h6>
         <hr>
-        <p *ngIf="!todoeldia; else elseBlock">
+
+        <p *ngIf="todoeldia; else elseBlock">
             <i class="fa-solid fa-bars-staggered"></i> {{descripcionevento}}
         </p>
+
         <ng-template #elseBlock>
-        <p><i class="fa-solid fa-bars-staggered"></i> hola</p>
+            <p><i class="fa-solid fa-bars-staggered"></i> {{descripcionevento}}</p>
+
+            <hr>
+            <div><i class="fas fa-user fa-fw"></i> {{usuarioevento}}  </div>
+            <div *ngIf="quienasigno != null"><h6><i class="fas fa-user-friends fa-fw"></i> {{quienasigno}}</h6></div>
+
         </ng-template>
 
-        <hr>
-        <div><i class="fas fa-user fa-fw"></i> {{usuarioevento}}  </div>
-        <div *ngIf="quienasigno != null"><h6><i class="fas fa-user-friends fa-fw"></i> {{quienasigno}}</h6></div>
+        
 	</div>
 	<div class="modal-footer">
-        <div *ngIf="quienasigno == null || roll == 1">
-            <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="activomodal2(modal2)">Editar</button>
+        <div *ngIf="todoeldia == 0">
+            <div *ngIf="quienasigno == null || roll == 1">
+                <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="activomodal2(modal2)">Editar</button>
+            </div>
         </div>
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">Cerrar</button>
 	</div>
