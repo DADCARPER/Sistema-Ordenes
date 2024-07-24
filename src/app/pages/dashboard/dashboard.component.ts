@@ -1,5 +1,6 @@
 import { Component, ViewChild, TemplateRef, ViewContainerRef, OnInit, inject } from '@angular/core';
 import { TemplatetopComponent } from '../templatetop/templatetop.component';
+import { TemplatenavComponent } from '../templatenav/templatenav.component';
 import { TemplatebotComponent } from '../templatebot/templatebot.component';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
@@ -18,10 +19,11 @@ import { Router } from '@angular/router';
 import { UsuariosService } from '../../services/usuarios.service';
 
 
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule,TemplatetopComponent,TemplatebotComponent,FullCalendarModule,NgbTooltipModule,NgbModule,ReactiveFormsModule],
+  imports: [CommonModule,TemplatetopComponent,TemplatenavComponent,TemplatebotComponent,FullCalendarModule,NgbTooltipModule,NgbModule,ReactiveFormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

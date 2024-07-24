@@ -1,0 +1,38 @@
+<app-templatetop></app-templatetop>
+<div id="layoutSidenav">
+  
+    <app-templatenav></app-templatenav>
+    
+  <div id="layoutSidenav_content">
+
+    <main>
+      <div class="container-fluid px-4">
+          <h1 class="mt-4">Compañias</h1>
+          <ol class="breadcrumb mb-4">
+              <li class="breadcrumb-item"><a href="dashboard">Dashboard</a></li>
+              <li class="breadcrumb-item active">Compañias</li>
+          </ol>
+          <div class="card mb-4">
+              <div class="card-body">
+                <!-- TABLA DINAMICA-->
+                <ag-grid-angular class="ag-theme-quartz" style="height: 650px;" [rowData]="pacientes" [columnDefs]="colDefs" [pagination]="true"
+                [paginationPageSize]="10" [paginationPageSizeSelector]="[10, 50, 100]" (rowDoubleClicked)="activomodal(myModalContent,$event)">
+            
+                </ag-grid-angular>
+                    
+              </div>
+          </div>
+      </div>
+      
+    </main>
+
+    <app-templatebot></app-templatebot>
+
+      
+  </div>
+</div>
+
+<!-- Modal -->
+ <!-- Modal -->
+<ng-template #myModalContent let-modal>
+</ng-template>
