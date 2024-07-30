@@ -482,13 +482,27 @@
             <ng-template #blo2>
             
                 <div class="flex-grow-1" style="margin-left: 10px;">
-                    <label for="nombreasignador" class="form-label">Asignar a :</label>
-                    <select class="form-select" id="nombreasignador" formControlName="nombreasignador">
-                    <option value="0" selected>Selecciona un usuario</option>
-                    <option *ngFor="let paciente of pacientes" [value]="paciente.usuarioid">
-                        {{ paciente.nombrecompleto }} {{ paciente.apellidocompleto }}
-                    </option>
+                    <div *ngIf="selectedNames.length > 0" class="mt-2">
+                        <label class="form-label">Asignar a :</label>
+                        <div>
+                          <span *ngFor="let name of selectedNames; let i = index">
+                            {{ name }}
+                            <img src="./assets/x.png" alt="Eliminar" (click)="removeName(i)" style="cursor: pointer; width: 16px; height: 16px; margin-bottom: 4px;">
+                            <span *ngIf="i < selectedNames.length - 1">, </span>
+                          </span>
+                        </div>
+                        <br>
+                    </div>
+                    <select class="form-select" id="nombreasignador" formControlName="nombreasignador" (change)="onSelectChange($event)">
+                        <option value="0" selected>Selecciona un usuario</option>
+                        <option *ngFor="let paciente of pacientes" [value]="paciente.usuarioid">
+                            {{ paciente.nombrecompleto }} {{ paciente.apellidocompleto }}
+                        </option>
                     </select>
+                    <!-- Contenedor para mostrar los nombres seleccionados -->
+                    
+            
+                    
                 </div>
                 
             </ng-template>

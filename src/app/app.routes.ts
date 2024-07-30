@@ -5,6 +5,8 @@ import { PerfilComponent } from './pages/perfil/perfil.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 import { LoginComponent } from './pages/login/login.component';
 import { CompaniaComponent } from './pages/compania/compania.component';
+import { EmpresasComponent } from './pages/empresas/empresas.component';
+
 
 export const routes: Routes = [
 
@@ -12,6 +14,7 @@ export const routes: Routes = [
     { path: 'perfil', component: PerfilComponent },
     { path: 'usuarios', component: UsuariosComponent },
     { path: 'compania', component: CompaniaComponent },
+    { path: 'empresas', component: EmpresasComponent },
     { path: 'dashboard', component: DashboardComponent },
     { path: '**', redirectTo: '', pathMatch:'full' }  
 

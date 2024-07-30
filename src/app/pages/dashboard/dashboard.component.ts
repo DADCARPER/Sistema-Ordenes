@@ -69,6 +69,9 @@ export class DashboardComponent implements OnInit {
   lastClickTime:any;
 
   vistatotal: string = 'no';
+
+  selectedValues: string[] = []; // Array para almacenar los valores seleccionados del select crear
+  selectedNames: string[] = []; // Array para almacenar los nombres completos seleccionados
   
 
   private _calendario = inject(CalendarioService);
@@ -519,11 +522,13 @@ export class DashboardComponent implements OnInit {
     let usuarioIDasignado: any;
     let bordecolor: any;
     let colorfondo: any;
+
+    let acceso:number = 0;
     
 
-    // console.log("halassssssssssssssssssss "+typeof this.formueditar.value.nombreasignador);
+    console.log("halassssssssssssssssssss "+ this.formueditar.value.nombreasignador);
     // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
-    if(this.formueditar.value.nombreasignador == "0" || this.formueditar.value.nombreasignador === sessionStorage.getItem("us") ){
+    if(this.formueditar.value.nombreasignador == "0" ){
 
       usuarioID = sessionStorage.getItem("us");
       usuarioIDasignado = ""; //si valor es 0 id es igual al de la sesion el campo debe ir vacio
@@ -542,18 +547,36 @@ export class DashboardComponent implements OnInit {
 
     }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
 
-      usuarioID = this.formueditar.value.nombreasignador;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
-      usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
-      color = "#fac307";
-      bordecolor = "#fac307";
-      colorfondo = "#fac307";
+      acceso = 1;
+      this.selectedValues.forEach(num =>{
+        
+        usuarioID = num;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+        usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+        color = sessionStorage.getItem("cl");
+        bordecolor = sessionStorage.getItem("cl");
+        colorfondo = sessionStorage.getItem("cl");
+        console.log(num);
 
+        if(num == usuarioIDasignado ){
+          usuarioIDasignado="";
+        }
 
+        this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+          //console.log(events);
+        });
+      
+      });
+      
+      
     }
 
-    this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
-      //console.log(events);
-    });
+    if(acceso == 0){
+
+      this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+        //console.log(events);
+      });
+    
+    }
 
     const calendarApi = this.calendarComponent.getApi();
 
@@ -577,6 +600,10 @@ export class DashboardComponent implements OnInit {
       this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
     }
 
+    acceso = 0;
+    this.selectedValues = []; //limpio el array
+    this.selectedNames = []; //limpio el array
+
     this.modal5?.dismiss();
       
 
@@ -597,6 +624,39 @@ export class DashboardComponent implements OnInit {
 
     }
     
+
+    onSelectChange(event: Event) {
+      const selectElement = event.target as HTMLSelectElement;
+      const selectedValue = selectElement.value;
+      //console.log('Valor seleccionado:', selectedValue);
+
+      if (selectedValue === '0' || this.selectedValues.includes(selectedValue)) {
+        return; // No hacer nada si el valor seleccionado es "0" o ya está en el array
+      }
+  
+      // Almacenar el valor seleccionado en el array
+      this.selectedValues.push(selectedValue);
+  
+      // Buscar el nombre completo del paciente correspondiente al usuarioid seleccionado
+      const selectedPaciente = this.pacientes.find((paciente:any) => paciente.usuarioid === selectedValue);
+      if (selectedPaciente) {
+        //const nombreCompleto = `${selectedPaciente.nombrecompleto} ${selectedPaciente.apellidocompleto}`;
+        const nombreCompleto = `${selectedPaciente.nombrecompleto}`;
+        this.selectedNames.push(nombreCompleto);
+        console.log('Nombres seleccionados:', this.selectedNames);
+      }
+  
+      console.log('Valores seleccionados:', this.selectedValues); // Mostrar el array en la consola
+    }
+
+
+    removeName(index: number) {
+      // Eliminar el nombre y su correspondiente valor seleccionado de los arrays
+      this.selectedNames.splice(index, 1);
+      this.selectedValues.splice(index, 1);
+      //console.log('Nombre eliminado, nuevos nombres seleccionados:', this.selectedNames);
+      //console.log('Nuevo array de valores seleccionados:', this.selectedValues);
+    }
 
 
 }
