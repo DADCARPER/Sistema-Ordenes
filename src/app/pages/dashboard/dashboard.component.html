@@ -7,7 +7,8 @@
 
     <main>
       <div class="container-fluid px-4">
-          <h1 class="mt-4">Calendario principal</h1>
+          
+          <h4 class="mt-4 active">Bienvenido <span style="color: #6c757d; font-style: italic;" >{{nombrecompleto}} {{apellidoscompleto}}</span></h4>
           <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item"><a href="dashboard">Calendario</a></li>
               <li class="breadcrumb-item active">Principal</li>
@@ -292,7 +293,7 @@
         
 	</div>
 	<div class="modal-footer">
-        <div *ngIf="quienasigno == null">
+        <div *ngIf="quienasigno == null || roll == 1">
             <button type="button" ngbAutofocus class="btn btn-outline-warning" (click)="sieliminaevento()">Si</button>
         </div>
 		<button type="button" class="btn btn-outline-secondary" (click)="modal.close('Close click')">No</button>
@@ -305,7 +306,7 @@
 		<div class="d-flex align-items-center w-100">
             <label for="titulo" class="form-label me-2"> <i class="fa-regular fa-calendar-days"></i> </label>
             <div class="flex-grow-1">
-              <input type="text" class="form-control" id="titulo" formControlName="titulo">
+              <input type="text" class="form-control" id="titulo" formControlName="titulo" placeholder="Ingrese el título">
               <div class="text-danger" *ngIf="formueditar.get('titulo')?.invalid && formueditar.get('titulo')?.touched">
                 <div *ngIf="formueditar.get('titulo')?.hasError('required')">Titulo es requerido.</div>
                 <div *ngIf="formueditar.get('titulo')?.hasError('minlength')">Ingrese un titulo más descriptivo.</div>

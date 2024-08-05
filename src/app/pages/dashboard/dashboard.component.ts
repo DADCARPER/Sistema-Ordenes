@@ -63,6 +63,8 @@ export class DashboardComponent implements OnInit {
 
   idlogueado: any;
   roll:any;
+  nombrecompleto:any;
+  apellidoscompleto:any;
   pacientes:any;
 
  
@@ -118,7 +120,7 @@ export class DashboardComponent implements OnInit {
   cargareventos(accion:any,numcalendar:any,idusuario:any,token:any){
     //let token = "d9f495f93f200f5be8c002eb4c9b22ba";
     this._calendario.cargaeventos(accion,numcalendar,idusuario,token).subscribe((events: any[]) => {
-      console.log(events);
+      //console.log(events);
       
       this.calendarOptions.events = (events || []).map(event => {
         const mappedEvent = {
@@ -138,7 +140,7 @@ export class DashboardComponent implements OnInit {
         this.nombrequiencrea = mappedEvent.userId; //asigno el nombre para usarlo al momento de crear un evento
 
         // Log para ver el valor de allDay después de la conversión
-        console.log(`Event: ${mappedEvent.userId}, All Day: ${mappedEvent.asignado}`);
+        //console.log(`id: ${mappedEvent.userId}, title: ${mappedEvent.title}, start: ${mappedEvent.start}, end: ${mappedEvent.end}, All Day: ${mappedEvent.allDay}, userId: ${mappedEvent.userId}, asignado: ${mappedEvent.asignado}`);
   
         return mappedEvent;
       });
@@ -243,7 +245,7 @@ export class DashboardComponent implements OnInit {
   
       });
       this.formueditar.get("nombreasignador")?.setValue("0");
-      this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true });
+      this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true, size: 'lg' });
 
     } else {
       // Actualizar el tiempo del último clic
@@ -270,6 +272,10 @@ export class DashboardComponent implements OnInit {
 
         this.formueditar.get("nombreasignador")?.setValue(sessionStorage.getItem("us"));
 
+        //tomo el objeto de todos los usuarios y lo filtro por idlogueado. seguido extraigo nombre y apellidos
+        const usuarioId1 = data.find((user:any) => user.usuarioid === this.idlogueado);
+        this.nombrecompleto = usuarioId1 ? usuarioId1.nombrecompleto : '';
+        this.apellidoscompleto = usuarioId1 ? usuarioId1.apellidocompleto : '';
         console.log(data);
 
         this.pacientes= data;
@@ -302,7 +308,7 @@ export class DashboardComponent implements OnInit {
     this.usuarioevento = info.event.extendedProps.userId;
     this.quienasigno = info.event.extendedProps.asignado;
     this.todoeldia = info.event.allDay;
-    console.log("todo el dia :"+this.usuarioevento);
+    //console.log("todo el dia :"+this.quienasigno);
 
     this.modal0 = this._serviciomodal.open(content,{ centered: true });
     //alert(`Evento: ${info.event.title}\nDescripción: ${info.event.extendedProps.description}`);
@@ -441,7 +447,7 @@ export class DashboardComponent implements OnInit {
 
     this._serviciomodal.open(content,{ centered: true });
 
-    console.log(info.event.title);
+    //console.log(info.event.title);
     // this.tituloevento = info.event.title;
     // this.startevento = this.formatTime(info.event.start);
     // this.endevento = this.formatTime(info.event.end);
@@ -483,7 +489,7 @@ export class DashboardComponent implements OnInit {
   
   guardar(){
     this._calendario.editarevento(2,1,this.idevento,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,this.formueditar.value.descripcion,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
-      console.log(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
+      //console.log(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
     });
 
     this.eventoactualdioclic.setProp('title', this.formueditar.value.titulo);
@@ -506,7 +512,7 @@ export class DashboardComponent implements OnInit {
   
   sieliminaevento(){
     this._calendario.eliminarevento(4,1,this.idevento,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
-      console.log(events);
+      //console.log(events);
     });
     this.eventoactualdioclic.remove();
     this.modal3?.dismiss();
@@ -526,7 +532,7 @@ export class DashboardComponent implements OnInit {
     let acceso:number = 0;
     
 
-    console.log("halassssssssssssssssssss "+ this.formueditar.value.nombreasignador);
+    console.log("Valoe del select "+ this.formueditar.value.nombreasignador);
     // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
     if(this.formueditar.value.nombreasignador == "0" ){
 
@@ -535,6 +541,7 @@ export class DashboardComponent implements OnInit {
       color = sessionStorage.getItem("cl");
       bordecolor = sessionStorage.getItem("cl");
       colorfondo = sessionStorage.getItem("cl");
+      console.log("Entro 1");
 
     }else if(this.formueditar.value.nombreasignador == ""){ /// la peticion de crear viene de un suario sin rol de administrador crea evento en su propio calendario
       
@@ -544,6 +551,7 @@ export class DashboardComponent implements OnInit {
       color = "#fac307";
       bordecolor = "#fac307";
       colorfondo = "#fac307";
+      console.log("Entro 2");
 
     }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
 
@@ -555,10 +563,12 @@ export class DashboardComponent implements OnInit {
         color = sessionStorage.getItem("cl");
         bordecolor = sessionStorage.getItem("cl");
         colorfondo = sessionStorage.getItem("cl");
-        console.log(num);
+        console.log("Entro 3");
+        //console.log(num);
 
         if(num == usuarioIDasignado ){
           usuarioIDasignado="";
+          console.log("Entro 4");
         }
 
         this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
@@ -581,6 +591,7 @@ export class DashboardComponent implements OnInit {
     const calendarApi = this.calendarComponent.getApi();
 
     calendarApi.addEvent({
+      
       title: this.formueditar.value.titulo!,
       start: this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00',
       end: this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00',
@@ -592,13 +603,16 @@ export class DashboardComponent implements OnInit {
       backgroundColor: colorfondo 
     });
 
-
-
-    if (this.vistatotal === 'no'){
-      this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
-    }else{
-      this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
-    }
+    console.log(this.vistatotal);
+    setTimeout(() => {
+      if (this.vistatotal === 'no'){
+        this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
+        console.log("Entro vistatotal NO");
+      }else{
+        this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
+        console.log("Entro vistatotal SI");
+      }
+    }, 3000);
 
     acceso = 0;
     this.selectedValues = []; //limpio el array
@@ -616,10 +630,11 @@ export class DashboardComponent implements OnInit {
       if (this.vistatotal === 'no'){
         this.vistatotal = "si";
         this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
-        
+        console.log('ENTRO NO');
       }else{
         this.vistatotal = "no";
         this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
+        console.log('ENTRO SI');
       }
 
     }
@@ -643,10 +658,10 @@ export class DashboardComponent implements OnInit {
         //const nombreCompleto = `${selectedPaciente.nombrecompleto} ${selectedPaciente.apellidocompleto}`;
         const nombreCompleto = `${selectedPaciente.nombrecompleto}`;
         this.selectedNames.push(nombreCompleto);
-        console.log('Nombres seleccionados:', this.selectedNames);
+        //console.log('Nombres seleccionados:', this.selectedNames);
       }
   
-      console.log('Valores seleccionados:', this.selectedValues); // Mostrar el array en la consola
+      //console.log('Valores seleccionados:', this.selectedValues); // Mostrar el array en la consola
     }
 
 

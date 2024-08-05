@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
 
   revisartokenenbase(){
     if(sessionStorage.getItem("tk")){
-      this._router.navigate(['usuarios']);
+      this._router.navigate(['dashboard']);
     }
   }
 
@@ -58,12 +58,18 @@ export class LoginComponent implements OnInit {
       //console.log(datosFormulario);
       this._authservice.loginsesion(this.formuloguin.value.correoelectronico ?? '',this.formuloguin.value.contrasena ?? '').subscribe(data =>{
         let dataResponse = data;
-        console.log(data);
+        //console.log(data);
         if(dataResponse.status == "ok"){
           sessionStorage.setItem("tk",dataResponse.result.token);
           sessionStorage.setItem("rl",dataResponse.result.rol);
           sessionStorage.setItem("us",dataResponse.result.id);
           sessionStorage.setItem("cl",dataResponse.result.colores);
+          sessionStorage.setItem("pn",dataResponse.result.pnombre);
+          sessionStorage.setItem("sn",dataResponse.result.snombre);
+          sessionStorage.setItem("pa",dataResponse.result.papellido);
+          sessionStorage.setItem("sa",dataResponse.result.sapellido);
+          sessionStorage.setItem("co",dataResponse.result.correo);
+          sessionStorage.setItem("fo",dataResponse.result.foto);
 
           this._router.navigate(['dashboard']);
         }else{
