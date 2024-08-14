@@ -48,15 +48,44 @@
 		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
 	</div>
 	<div class="modal-body">
-		<h6> <i class="fa-regular fa-clock"></i> De : {{startevento}} Hasta : {{endevento}} </h6>
-        <hr>
+        <div *ngIf="!todoeldia">
+            <div class="row">
+                <div class="col-md-4">
+                    <i class="fa-regular fa-clock"></i> Contratante : Seguros Bolivar 
+                </div>
+                <div class="col-md-4">
+                    <i class="fa-regular fa-clock"></i> Actividad : Seguros Bolivar 
+                </div>
+                <div class="col-md-4">
+                    <i class="fa-regular fa-clock"></i> Modalidad : Seguros Bolivar 
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <i class="fa-regular fa-clock"></i> Contacto : Seguros Bolivar 
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <i class="fa-regular fa-clock"></i> Dirección : https://www.youtube.com/watch?v=94TAFSMdkvkhttps://www.youtube.com/watch?v=94TAFSMdkvkhttps://www.youtube.com/watch?v=94TAFSMdkvk 
+                </div>
+            </div>
+            <hr>
+        </div>
 
-        <p *ngIf="todoeldia; else elseBlock">
+        <div *ngIf="todoeldia; else elseBlock">
             <i class="fa-solid fa-bars-staggered"></i> {{descripcionevento}}
-        </p>
+            <hr>
+            <h6> <i class="fa-regular fa-clock"></i> De : {{startevento}} Hasta : {{endevento}} </h6>
+        </div>
+        
 
+        
         <ng-template #elseBlock>
             <p><i class="fa-solid fa-bars-staggered"></i> {{descripcionevento}}</p>
+
+            <hr>
+            <h6> <i class="fa-regular fa-clock"></i> De : {{startevento}} Hasta : {{endevento}} </h6>
 
             <hr>
             <div><i class="fas fa-user fa-fw"></i> {{usuarioevento}}  </div>
@@ -64,6 +93,7 @@
 
         </ng-template>
 
+        
         
 	</div>
 	<div class="modal-footer">
@@ -304,7 +334,7 @@
     <form [formGroup]="formueditar" (ngSubmit)="guardar()">
 	<div class="modal-header">
 		<div class="d-flex align-items-center w-100">
-            <label for="titulo" class="form-label me-2"> <i class="fa-regular fa-calendar-days"></i> </label>
+            <label for="titulo" class="form-label me-2"> <i class="fa-regular fa-calendar-plus"></i> </label>
             <div class="flex-grow-1">
               <input type="text" class="form-control" id="titulo" formControlName="titulo" placeholder="Ingrese el título">
               <div class="text-danger" *ngIf="formueditar.get('titulo')?.invalid && formueditar.get('titulo')?.touched">
@@ -318,147 +348,79 @@
 		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
 	</div>
 	<div class="modal-body">
+
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-4">
                 <div class="d-flex align-items-center">
-                    <label for="finicial" class="form-label"> <i class="fa-regular fa-clock"></i>  </label> 
+                    <label for="contratante" class="form-label"> <i class="fa-regular fa-handshake"></i>  </label> 
                     <div class="flex-grow-1" style="margin-left: 10px; margin-bottom: 10px;">
-                        <input type="date" class="form-control" id="finicial" formControlName="finicial" >
-                        <div  class="text-danger" *ngIf="formueditar.get('finicial')?.invalid && formueditar.get('finicial')?.touched">
-                            <div *ngIf="this.formueditar.get('finicial')?.hasError('required');">Fecha inicial requerido.</div>
-                            <div *ngIf="this.formueditar.get('finicial')?.hasError('minlength');">Ingrese un valor valido.</div>
-                            <div *ngIf="this.formueditar.get('finicial')?.hasError('maxlength');">Limite excedido.</div>
+                        <input type="text" class="form-control" list="states" id="contratante" formControlName="contratante" placeholder="Contratante">
+                        <datalist id="states">
+                            <option *ngFor="let compania of companias" [value]="compania.nombre"></option>
+                        </datalist>
+                        <div  class="text-danger" *ngIf="formueditar.get('contratante')?.invalid && formueditar.get('contratante')?.touched">
+                            <div *ngIf="this.formueditar.get('contratante')?.hasError('required');">Contratante requerido.</div>
+                            <div *ngIf="this.formueditar.get('contratante')?.hasError('minlength');">Ingrese un contratante valido.</div>
+                            <div *ngIf="this.formueditar.get('contratante')?.hasError('maxlength');">Limite excedido.</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <select class="form-select" id="hinicial" formControlName="hinicial">
-                    <option value="00:00">12:00 a.m.</option>
-                    <option value="00:30">12:30 a.m.</option>
-                    <option value="01:00">01:00 a.m.</option>
-                    <option value="01:30">01:30 a.m.</option>
-                    <option value="02:00">02:00 a.m.</option>
-                    <option value="02:30">02:30 a.m.</option>
-                    <option value="03:00">03:00 a.m.</option>
-                    <option value="03:30">03:30 a.m.</option>
-                    <option value="04:00">04:00 a.m.</option>
-                    <option value="04:30">04:30 a.m.</option>
-                    <option value="05:00">05:00 a.m.</option>
-                    <option value="05:30">05:30 a.m.</option>
-                    <option value="06:00">06:00 a.m.</option>
-                    <option value="06:30">06:30 a.m.</option>
-                    <option value="07:00">07:00 a.m.</option>
-                    <option value="07:30">07:30 a.m.</option>
-                    <option value="08:00">08:00 a.m.</option>
-                    <option value="08:30">08:30 a.m.</option>
-                    <option value="09:00">09:00 a.m.</option>
-                    <option value="09:30">09:30 a.m.</option>
-                    <option value="10:00">10:00 a.m.</option>
-                    <option value="10:30">10:30 a.m.</option>
-                    <option value="11:00">11:00 a.m.</option>
-                    <option value="11:30">11:30 a.m.</option>
-                    <option value="12:00">12:00 p.m.</option>
-                    <option value="12:30">12:30 p.m.</option>
-                    <option value="13:00">01:00 p.m.</option>
-                    <option value="13:30">01:30 p.m.</option>
-                    <option value="14:00">02:00 p.m.</option>
-                    <option value="14:30">02:30 p.m.</option>
-                    <option value="15:00">03:00 p.m.</option>
-                    <option value="15:30">03:30 p.m.</option>
-                    <option value="16:00">04:00 p.m.</option>
-                    <option value="16:30">04:30 p.m.</option>
-                    <option value="17:00">05:00 p.m.</option>
-                    <option value="17:30">05:30 p.m.</option>
-                    <option value="18:00">06:00 p.m.</option>
-                    <option value="18:30">06:30 p.m.</option>
-                    <option value="19:00">07:00 p.m.</option>
-                    <option value="19:30">07:30 p.m.</option>
-                    <option value="20:00">08:00 p.m.</option>
-                    <option value="20:30">08:30 p.m.</option>
-                    <option value="21:00">09:00 p.m.</option>
-                    <option value="21:30">09:30 p.m.</option>
-                    <option value="22:00">10:00 p.m.</option>
-                    <option value="22:30">10:30 p.m.</option>
-                    <option value="23:00">11:00 p.m.</option>
-                    <option value="23:30">11:30 p.m.</option>
-
+            <div class="col-md-4">
+                <select class="form-select" id="actividad" formControlName="actividad">
+                    <option value="0" selected>Tipo de actividad</option>
+                    <option value="1">Asesoría</option>
+                    <option value="2">Campaña</option>
+                    <option value="3">Capacitación</option>
+                    <option value="4">Reunión</option>
+                    <option value="5">RTAT</option>
+                    <option value="6">Trabajo de campo</option>
                 </select>
+                <div  class="text-danger" *ngIf="validoActividad">
+                    <div>Actividad es requerida.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="modalidad" formControlName="modalidad">
+                    <option value="0" selected>Selecciona modalidad</option>
+                    <option value="1">Presencial</option>
+                    <option value="2">Virtual</option>
+                </select>
+                <div  class="text-danger" *ngIf="validoModalidad">
+                    <div>Modalidad es requerida.</div>
+                </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="d-flex align-items-center">
-                    <div class="flex-grow-1" style="margin-left: 25px;">
-                        <input type="date" class="form-control" id="ffinal" formControlName="ffinal" >
-                        <div  class="text-danger" *ngIf="formueditar.get('ffinal')?.invalid && formueditar.get('ffinal')?.touched">
-                            <div *ngIf="this.formueditar.get('ffinal')?.hasError('required');">Fecha final requerido.</div>
-                            <div *ngIf="this.formueditar.get('ffinal')?.hasError('minlength');">Ingrese un valor valido.</div>
-                            <div *ngIf="this.formueditar.get('ffinal')?.hasError('maxlength');">Limite excedido.</div>
+                    <label for="contacto" class="form-label"> <i class="fa-regular fa-address-book"></i>  </label> 
+                    <div class="flex-grow-1" style="margin-left: 10px;">
+                        <input type="text" class="form-control" id="contacto" formControlName="contacto" placeholder="Persona de contacto">
+                        <div  class="text-danger" *ngIf="formueditar.get('contacto')?.invalid && formueditar.get('contacto')?.touched">
+                            <div *ngIf="this.formueditar.get('contacto')?.hasError('maxlength');">Limite excedido.</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <select class="form-select" id="hfinal" formControlName="hfinal">
-                    <option value="00:00">12:00 a.m.</option>
-                    <option value="00:30">12:30 a.m.</option>
-                    <option value="01:00">01:00 a.m.</option>
-                    <option value="01:30">01:30 a.m.</option>
-                    <option value="02:00">02:00 a.m.</option>
-                    <option value="02:30">02:30 a.m.</option>
-                    <option value="03:00">03:00 a.m.</option>
-                    <option value="03:30">03:30 a.m.</option>
-                    <option value="04:00">04:00 a.m.</option>
-                    <option value="04:30">04:30 a.m.</option>
-                    <option value="05:00">05:00 a.m.</option>
-                    <option value="05:30">05:30 a.m.</option>
-                    <option value="06:00">06:00 a.m.</option>
-                    <option value="06:30">06:30 a.m.</option>
-                    <option value="07:00">07:00 a.m.</option>
-                    <option value="07:30">07:30 a.m.</option>
-                    <option value="08:00">08:00 a.m.</option>
-                    <option value="08:30">08:30 a.m.</option>
-                    <option value="09:00">09:00 a.m.</option>
-                    <option value="09:30">09:30 a.m.</option>
-                    <option value="10:00">10:00 a.m.</option>
-                    <option value="10:30">10:30 a.m.</option>
-                    <option value="11:00">11:00 a.m.</option>
-                    <option value="11:30">11:30 a.m.</option>
-                    <option value="12:00">12:00 p.m.</option>
-                    <option value="12:30">12:30 p.m.</option>
-                    <option value="13:00">01:00 p.m.</option>
-                    <option value="13:30">01:30 p.m.</option>
-                    <option value="14:00">02:00 p.m.</option>
-                    <option value="14:30">02:30 p.m.</option>
-                    <option value="15:00">03:00 p.m.</option>
-                    <option value="15:30">03:30 p.m.</option>
-                    <option value="16:00">04:00 p.m.</option>
-                    <option value="16:30">04:30 p.m.</option>
-                    <option value="17:00">05:00 p.m.</option>
-                    <option value="17:30">05:30 p.m.</option>
-                    <option value="18:00">06:00 p.m.</option>
-                    <option value="18:30">06:30 p.m.</option>
-                    <option value="19:00">07:00 p.m.</option>
-                    <option value="19:30">07:30 p.m.</option>
-                    <option value="20:00">08:00 p.m.</option>
-                    <option value="20:30">08:30 p.m.</option>
-                    <option value="21:00">09:00 p.m.</option>
-                    <option value="21:30">09:30 p.m.</option>
-                    <option value="22:00">10:00 p.m.</option>
-                    <option value="22:30">10:30 p.m.</option>
-                    <option value="23:00">11:00 p.m.</option>
-                    <option value="23:30">11:30 p.m.</option>
-
-                </select>
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <label for="direccion" class="form-label"> <i class="fa-regular fa-paste"></i>  </label> 
+                    <div class="flex-grow-1" style="margin-left: 10px;">
+                        <input type="text" class="form-control" id="direccion" formControlName="direccion" placeholder="Dirección o Link">
+                        <div  class="text-danger" *ngIf="formueditar.get('direccion')?.invalid && formueditar.get('direccion')?.touched">
+                            <div *ngIf="this.formueditar.get('direccion')?.hasError('maxlength');">Limite excedido.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <hr>
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="d-flex align-items-center">
                     <label for="descripcion" class="form-label" ><i class="fa-solid fa-bars-staggered"> </i></label>
                     <div class="flex-grow-1" style="margin-left: 10px;">
@@ -469,6 +431,146 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-6">
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center">
+                            <label for="finicial" class="form-label"> <i class="fa-regular fa-clock"></i>  </label> 
+                            <div class="flex-grow-1" style="margin-left: 10px; margin-bottom: 10px;">
+                                <input type="date" class="form-control" id="finicial" formControlName="finicial" >
+                                <div  class="text-danger" *ngIf="formueditar.get('finicial')?.invalid && formueditar.get('finicial')?.touched">
+                                    <div *ngIf="this.formueditar.get('finicial')?.hasError('required');">Fecha inicial requerido.</div>
+                                    <div *ngIf="this.formueditar.get('finicial')?.hasError('minlength');">Ingrese un valor valido.</div>
+                                    <div *ngIf="this.formueditar.get('finicial')?.hasError('maxlength');">Limite excedido.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <select class="form-select" id="hinicial" formControlName="hinicial">
+                            <option value="00:00">12:00 a.m.</option>
+                            <option value="00:30">12:30 a.m.</option>
+                            <option value="01:00">01:00 a.m.</option>
+                            <option value="01:30">01:30 a.m.</option>
+                            <option value="02:00">02:00 a.m.</option>
+                            <option value="02:30">02:30 a.m.</option>
+                            <option value="03:00">03:00 a.m.</option>
+                            <option value="03:30">03:30 a.m.</option>
+                            <option value="04:00">04:00 a.m.</option>
+                            <option value="04:30">04:30 a.m.</option>
+                            <option value="05:00">05:00 a.m.</option>
+                            <option value="05:30">05:30 a.m.</option>
+                            <option value="06:00">06:00 a.m.</option>
+                            <option value="06:30">06:30 a.m.</option>
+                            <option value="07:00">07:00 a.m.</option>
+                            <option value="07:30">07:30 a.m.</option>
+                            <option value="08:00">08:00 a.m.</option>
+                            <option value="08:30">08:30 a.m.</option>
+                            <option value="09:00">09:00 a.m.</option>
+                            <option value="09:30">09:30 a.m.</option>
+                            <option value="10:00">10:00 a.m.</option>
+                            <option value="10:30">10:30 a.m.</option>
+                            <option value="11:00">11:00 a.m.</option>
+                            <option value="11:30">11:30 a.m.</option>
+                            <option value="12:00">12:00 p.m.</option>
+                            <option value="12:30">12:30 p.m.</option>
+                            <option value="13:00">01:00 p.m.</option>
+                            <option value="13:30">01:30 p.m.</option>
+                            <option value="14:00">02:00 p.m.</option>
+                            <option value="14:30">02:30 p.m.</option>
+                            <option value="15:00">03:00 p.m.</option>
+                            <option value="15:30">03:30 p.m.</option>
+                            <option value="16:00">04:00 p.m.</option>
+                            <option value="16:30">04:30 p.m.</option>
+                            <option value="17:00">05:00 p.m.</option>
+                            <option value="17:30">05:30 p.m.</option>
+                            <option value="18:00">06:00 p.m.</option>
+                            <option value="18:30">06:30 p.m.</option>
+                            <option value="19:00">07:00 p.m.</option>
+                            <option value="19:30">07:30 p.m.</option>
+                            <option value="20:00">08:00 p.m.</option>
+                            <option value="20:30">08:30 p.m.</option>
+                            <option value="21:00">09:00 p.m.</option>
+                            <option value="21:30">09:30 p.m.</option>
+                            <option value="22:00">10:00 p.m.</option>
+                            <option value="22:30">10:30 p.m.</option>
+                            <option value="23:00">11:00 p.m.</option>
+                            <option value="23:30">11:30 p.m.</option>
+        
+                        </select>
+                    </div>
+                </div>
+        
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1" style="margin-left: 25px;">
+                                <input type="date" class="form-control" id="ffinal" formControlName="ffinal" >
+                                <div  class="text-danger" *ngIf="formueditar.get('ffinal')?.invalid && formueditar.get('ffinal')?.touched">
+                                    <div *ngIf="this.formueditar.get('ffinal')?.hasError('required');">Fecha final requerido.</div>
+                                    <div *ngIf="this.formueditar.get('ffinal')?.hasError('minlength');">Ingrese un valor valido.</div>
+                                    <div *ngIf="this.formueditar.get('ffinal')?.hasError('maxlength');">Limite excedido.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <select class="form-select" id="hfinal" formControlName="hfinal">
+                            <option value="00:00">12:00 a.m.</option>
+                            <option value="00:30">12:30 a.m.</option>
+                            <option value="01:00">01:00 a.m.</option>
+                            <option value="01:30">01:30 a.m.</option>
+                            <option value="02:00">02:00 a.m.</option>
+                            <option value="02:30">02:30 a.m.</option>
+                            <option value="03:00">03:00 a.m.</option>
+                            <option value="03:30">03:30 a.m.</option>
+                            <option value="04:00">04:00 a.m.</option>
+                            <option value="04:30">04:30 a.m.</option>
+                            <option value="05:00">05:00 a.m.</option>
+                            <option value="05:30">05:30 a.m.</option>
+                            <option value="06:00">06:00 a.m.</option>
+                            <option value="06:30">06:30 a.m.</option>
+                            <option value="07:00">07:00 a.m.</option>
+                            <option value="07:30">07:30 a.m.</option>
+                            <option value="08:00">08:00 a.m.</option>
+                            <option value="08:30">08:30 a.m.</option>
+                            <option value="09:00">09:00 a.m.</option>
+                            <option value="09:30">09:30 a.m.</option>
+                            <option value="10:00">10:00 a.m.</option>
+                            <option value="10:30">10:30 a.m.</option>
+                            <option value="11:00">11:00 a.m.</option>
+                            <option value="11:30">11:30 a.m.</option>
+                            <option value="12:00">12:00 p.m.</option>
+                            <option value="12:30">12:30 p.m.</option>
+                            <option value="13:00">01:00 p.m.</option>
+                            <option value="13:30">01:30 p.m.</option>
+                            <option value="14:00">02:00 p.m.</option>
+                            <option value="14:30">02:30 p.m.</option>
+                            <option value="15:00">03:00 p.m.</option>
+                            <option value="15:30">03:30 p.m.</option>
+                            <option value="16:00">04:00 p.m.</option>
+                            <option value="16:30">04:30 p.m.</option>
+                            <option value="17:00">05:00 p.m.</option>
+                            <option value="17:30">05:30 p.m.</option>
+                            <option value="18:00">06:00 p.m.</option>
+                            <option value="18:30">06:30 p.m.</option>
+                            <option value="19:00">07:00 p.m.</option>
+                            <option value="19:30">07:30 p.m.</option>
+                            <option value="20:00">08:00 p.m.</option>
+                            <option value="20:30">08:30 p.m.</option>
+                            <option value="21:00">09:00 p.m.</option>
+                            <option value="21:30">09:30 p.m.</option>
+                            <option value="22:00">10:00 p.m.</option>
+                            <option value="22:30">10:30 p.m.</option>
+                            <option value="23:00">11:00 p.m.</option>
+                            <option value="23:30">11:30 p.m.</option>
+        
+                        </select>
+                    </div>
+                </div>
+
             </div>
         </div>
 

@@ -64,3 +64,14 @@
   border: 2px solid #f8f9fa !important;
 } 
 */ 
+
+.fc-event {
+  font-size: 11px; /* Ajusta el tamaño de la letra aquí */
+  font-family: Geneva, Tahoma, sans-serif;
+ /*  font-weight: bold; Opcional: para hacer la fuente en negrita */
+  color: #000;
+}
+
+.fc-event:hover {
+  color: #bebdbd; /* Cambia esto por el color que prefieras */
+}

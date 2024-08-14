@@ -17,6 +17,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { an } from '@fullcalendar/core/internal-common';
 import { Router } from '@angular/router';
 import { UsuariosService } from '../../services/usuarios.service';
+import { CompaniasService } from '../../services/companias.service';
 
 
 
@@ -66,6 +67,7 @@ export class DashboardComponent implements OnInit {
   nombrecompleto:any;
   apellidoscompleto:any;
   pacientes:any;
+  companias:any;
 
  
   lastClickTime:any;
@@ -74,6 +76,9 @@ export class DashboardComponent implements OnInit {
 
   selectedValues: string[] = []; // Array para almacenar los valores seleccionados del select crear
   selectedNames: string[] = []; // Array para almacenar los nombres completos seleccionados
+
+  validoActividad: boolean = false;
+  validoModalidad: boolean = false;
   
 
   private _calendario = inject(CalendarioService);
@@ -81,6 +86,7 @@ export class DashboardComponent implements OnInit {
   private _formbuilder = inject(FormBuilder);
   private _router = inject(Router);
   private _usuarios = inject(UsuariosService);
+  private _compania = inject(CompaniasService);
 
 
 
@@ -99,8 +105,13 @@ export class DashboardComponent implements OnInit {
     nombreasignador: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
     backgroundColor: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
     boderColor: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
-    allDay: ['',[Validators.maxLength(1),Validators.minLength(1)]]
-
+    allDay: ['',[Validators.maxLength(1),Validators.minLength(1)]],
+    contratante: ['',[Validators.required,Validators.maxLength(50),Validators.minLength(2)]],
+    actividad: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(2)]],
+    modalidad: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
+    direccion: ['',[Validators.maxLength(90)]],
+    link: ['',[Validators.maxLength(90)]],
+    contacto: ['',[Validators.maxLength(60)]]
   });
 
 
@@ -130,8 +141,8 @@ export class DashboardComponent implements OnInit {
           end: event.allDay === '1' || !event.end ? null : event.end, // Si es allDay o end no está presente, se asigna null
           allDay: event.allDay === '1', // Convertir '1' a true y '0' a false
           description: event.description || 'No hay descripción.',
-          backgroundColor: event.nombreasignador == null ? event.backgroundColor : 'red',
-          borderColor: event.nombreasignador == null ? event.borderColor : 'red',
+          backgroundColor: event.nombreasignador == null ? event.backgroundColor : '#af0202',
+          borderColor: event.nombreasignador == null ? event.borderColor : '#af0202',
           userId: event.nombrecompleto,
           asignado: event.nombreasignador,
           display: 'auto'
@@ -244,8 +255,15 @@ export class DashboardComponent implements OnInit {
         'nombrecompleto': this.usuarioevento
   
       });
+      this.formueditar.get("actividad")?.setValue("0");
+      this.formueditar.get("modalidad")?.setValue("0");
       this.formueditar.get("nombreasignador")?.setValue("0");
       this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true, size: 'lg' });
+      // este codigo esta atento al cierre del modal. de tal forma que inicializa variableas de validar muy importante.
+      this.modal5.result.finally(() => {
+        this.validoActividad = false;
+        this.validoModalidad = false;
+      });
 
     } else {
       // Actualizar el tiempo del último clic
@@ -282,6 +300,13 @@ export class DashboardComponent implements OnInit {
       
       });
 
+      //llamo el combobox de empresas para que se cargue una sola vez al iniciar la aplicacion
+      this._compania.cargacompanias("si",1,sessionStorage.getItem("tk")).subscribe(data=>{
+        console.log(data);
+        this.companias= data;
+      
+      });
+
     }else{
       this.logout();
     }
@@ -310,7 +335,7 @@ export class DashboardComponent implements OnInit {
     this.todoeldia = info.event.allDay;
     //console.log("todo el dia :"+this.quienasigno);
 
-    this.modal0 = this._serviciomodal.open(content,{ centered: true });
+    this.modal0 = this._serviciomodal.open(content,{ centered: true, size: 'lg' });
     //alert(`Evento: ${info.event.title}\nDescripción: ${info.event.extendedProps.description}`);
     //this.activomodal1(this.modal1,info);
     
@@ -530,96 +555,105 @@ export class DashboardComponent implements OnInit {
     let colorfondo: any;
 
     let acceso:number = 0;
-    
 
-    console.log("Valoe del select "+ this.formueditar.value.nombreasignador);
-    // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
-    if(this.formueditar.value.nombreasignador == "0" ){
+    //validadores
+    if (this.formueditar.value.actividad == "0"){
+      this.validoActividad = true;
 
-      usuarioID = sessionStorage.getItem("us");
-      usuarioIDasignado = ""; //si valor es 0 id es igual al de la sesion el campo debe ir vacio
-      color = sessionStorage.getItem("cl");
-      bordecolor = sessionStorage.getItem("cl");
-      colorfondo = sessionStorage.getItem("cl");
-      console.log("Entro 1");
+    }else if (this.formueditar.value.modalidad == "0"){
+      this.validoModalidad = true;
 
-    }else if(this.formueditar.value.nombreasignador == ""){ /// la peticion de crear viene de un suario sin rol de administrador crea evento en su propio calendario
-      
-      
-      usuarioID = sessionStorage.getItem("us");  
-      usuarioIDasignado = this.formueditar.value.nombreasignador;   
-      color = "#fac307";
-      bordecolor = "#fac307";
-      colorfondo = "#fac307";
-      console.log("Entro 2");
+    }else{ // si el formulario se llena correctamente puede ingresar a crear el evento
 
-    }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
+      console.log("Valoe del select "+ this.formueditar.value.nombreasignador);
+      // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
+      if(this.formueditar.value.nombreasignador == "0" ){
 
-      acceso = 1;
-      this.selectedValues.forEach(num =>{
-        
-        usuarioID = num;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
-        usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+        usuarioID = sessionStorage.getItem("us");
+        usuarioIDasignado = ""; //si valor es 0 id es igual al de la sesion el campo debe ir vacio
         color = sessionStorage.getItem("cl");
         bordecolor = sessionStorage.getItem("cl");
         colorfondo = sessionStorage.getItem("cl");
-        console.log("Entro 3");
-        //console.log(num);
+        console.log("Entro 1");
 
-        if(num == usuarioIDasignado ){
-          usuarioIDasignado="";
-          console.log("Entro 4");
-        }
+      }else if(this.formueditar.value.nombreasignador == ""){ /// la peticion de crear viene de un suario sin rol de administrador crea evento en su propio calendario
+        
+        
+        usuarioID = sessionStorage.getItem("us");  
+        usuarioIDasignado = this.formueditar.value.nombreasignador;   
+        color = "#fac307";
+        bordecolor = "#fac307";
+        colorfondo = "#fac307";
+        console.log("Entro 2");
 
-        this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+      }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
+
+        acceso = 1;
+        this.selectedValues.forEach(num =>{
+          
+          usuarioID = num;  ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+          usuarioIDasignado = sessionStorage.getItem("us");   ///// DEBO INVERTIR LOS ID PUESTO QUE NECESITO QUE SE VEA EN OTRA CUENTA QUE NO ES LA DEL CREADOR.
+          color = sessionStorage.getItem("cl");
+          bordecolor = sessionStorage.getItem("cl");
+          colorfondo = sessionStorage.getItem("cl");
+          console.log("Entro 3");
+          //console.log(num);
+
+          if(num == usuarioIDasignado ){
+            usuarioIDasignado="";
+            console.log("Entro 4");
+          }
+
+          this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.contratante,this.formueditar.value.actividad,this.formueditar.value.modalidad,this.formueditar.value.contacto,this.formueditar.value.direccion,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+            //console.log(events);
+          });
+        
+        });
+        
+        
+      }
+
+      if(acceso == 0){
+
+        this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.contratante,this.formueditar.value.actividad,this.formueditar.value.modalidad,this.formueditar.value.contacto,this.formueditar.value.direccion,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
           //console.log(events);
         });
       
-      });
-      
-      
-    }
-
-    if(acceso == 0){
-
-      this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
-        //console.log(events);
-      });
-    
-    }
-
-    const calendarApi = this.calendarComponent.getApi();
-
-    calendarApi.addEvent({
-      
-      title: this.formueditar.value.titulo!,
-      start: this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00',
-      end: this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00',
-      extendedProps: {
-        description: this.formueditar.value.descripcion,
-        userId: this.nombrequiencrea
-      },
-      borderColor: bordecolor, 
-      backgroundColor: colorfondo 
-    });
-
-    console.log(this.vistatotal);
-    setTimeout(() => {
-      if (this.vistatotal === 'no'){
-        this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
-        console.log("Entro vistatotal NO");
-      }else{
-        this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
-        console.log("Entro vistatotal SI");
       }
-    }, 3000);
 
-    acceso = 0;
-    this.selectedValues = []; //limpio el array
-    this.selectedNames = []; //limpio el array
+      const calendarApi = this.calendarComponent.getApi();
 
-    this.modal5?.dismiss();
-      
+      calendarApi.addEvent({
+        
+        title: "Creando evento...",
+        start: this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00',
+        end: this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00',
+        extendedProps: {
+          description: this.formueditar.value.descripcion,
+          userId: this.nombrequiencrea
+        },
+        borderColor: bordecolor, 
+        backgroundColor: colorfondo 
+      });
+
+      console.log(this.vistatotal);
+      setTimeout(() => {
+        if (this.vistatotal === 'no'){
+          this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
+          console.log("Entro vistatotal NO");
+        }else{
+          this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
+          console.log("Entro vistatotal SI");
+        }
+      }, 3000);
+
+      acceso = 0;
+      this.selectedValues = []; //limpio el array
+      this.selectedNames = []; //limpio el array
+
+      this.modal5?.dismiss();
+       
+    }
 
   }
 
@@ -672,6 +706,8 @@ export class DashboardComponent implements OnInit {
       //console.log('Nombre eliminado, nuevos nombres seleccionados:', this.selectedNames);
       //console.log('Nuevo array de valores seleccionados:', this.selectedValues);
     }
+
+
 
 
 }
