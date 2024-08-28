@@ -39,6 +39,7 @@ export class DashboardComponent implements OnInit {
   modal3?: NgbModalRef;
   @ViewChild('modal4') modal4!: TemplateRef<any>; // Referencia al template del modal
   modal5?: NgbModalRef;
+  @ViewChild('modal6') modal6!: TemplateRef<any>; // Referencia al template del modal
 
   lastClicked: number = 0;
   events: any;
@@ -49,6 +50,11 @@ export class DashboardComponent implements OnInit {
 
   idevento:any;
   tituloevento: any;
+  contratante: any;
+  actividad: any;
+  modalidad: any;
+  contacto: any;
+  direccion: any;
   startevento: any;
   starmilitar: any;
   endevento: any;
@@ -79,7 +85,11 @@ export class DashboardComponent implements OnInit {
 
   validoActividad: boolean = false;
   validoModalidad: boolean = false;
-  
+
+  eventostotales:any;
+
+  usuariosolapado:any;
+  todosLosEventos:any;
 
   private _calendario = inject(CalendarioService);
   private _serviciomodal = inject(NgbModal);
@@ -106,10 +116,10 @@ export class DashboardComponent implements OnInit {
     backgroundColor: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
     boderColor: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
     allDay: ['',[Validators.maxLength(1),Validators.minLength(1)]],
-    contratante: ['',[Validators.required,Validators.maxLength(50),Validators.minLength(2)]],
+    contratante: ['',[Validators.maxLength(50),Validators.minLength(2)]],
     actividad: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(2)]],
     modalidad: ['',[Validators.required,Validators.maxLength(12),Validators.minLength(4)]],
-    direccion: ['',[Validators.maxLength(90)]],
+    direccion: ['',[Validators.maxLength(1000)]],
     link: ['',[Validators.maxLength(90)]],
     contacto: ['',[Validators.maxLength(60)]]
   });
@@ -128,6 +138,23 @@ export class DashboardComponent implements OnInit {
   //   { title: 'Visita de campo2', start: '2024-07-21T15:00:00', end: '2024-07-22T15:00:00',backgroundColor: 'purple', borderColor: 'purple', description: 'Descripción Orden 85325 con todo los datos puesto como telefono y mucho mas', userId: 'DAVID CARVAJAL PERNETT' }
   // ];
 
+  cargarTodosLosEventos() {
+    const token:any = sessionStorage.getItem('tk'); // O como manejes el token
+  
+    this._calendario.cargaeventos(1,1,"si",token).subscribe((events: any[]) => {
+      // Asegúrate de almacenar todos los eventos en la configuración del calendario o en una variable aparte
+      this.todosLosEventos = events.map(event => ({
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        userId: event.nombrecompleto, // O la propiedad correspondiente para identificar al usuario
+        // otras propiedades que necesites
+      }));
+    });
+  }
+  
+
   cargareventos(accion:any,numcalendar:any,idusuario:any,token:any){
     //let token = "d9f495f93f200f5be8c002eb4c9b22ba";
     this._calendario.cargaeventos(accion,numcalendar,idusuario,token).subscribe((events: any[]) => {
@@ -137,12 +164,17 @@ export class DashboardComponent implements OnInit {
         const mappedEvent = {
           id: event.id,
           title: event.title,
+          contratante: event.contratante,
+          actividad: event.actividad ? event.actividad : 0,
+          modalidad: event.modalidad ? event.modalidad : 0,
+          contacto: event.contacto,
+          direccion: event.direccion,
           start: event.start,
           end: event.allDay === '1' || !event.end ? null : event.end, // Si es allDay o end no está presente, se asigna null
           allDay: event.allDay === '1', // Convertir '1' a true y '0' a false
           description: event.description || 'No hay descripción.',
-          backgroundColor: event.nombreasignador == null ? event.backgroundColor : '#af0202',
-          borderColor: event.nombreasignador == null ? event.borderColor : '#af0202',
+          backgroundColor: event.nombreasignador == null ? event.backgroundColor : '#7c0404',
+          borderColor: event.nombreasignador == null ? event.borderColor : '#7c0404',
           userId: event.nombrecompleto,
           asignado: event.nombreasignador,
           display: 'auto'
@@ -215,6 +247,16 @@ export class DashboardComponent implements OnInit {
     eventClick: (info) => this.handleEventClick(info,this.modal1), // Manejador de clics en eventos
     //eventContent: (arg) => this.renderEventContent(arg), // Manejador para personalizar contenido del evento
 
+    dayCellDidMount: (info) => {
+      // Hacer que cada celda del día sea enfocable
+      info.el.setAttribute('tabindex', '-1');
+
+      // Opcional: Añadir un listener para enfocar el día al hacer clic
+      info.el.addEventListener('click', () => {
+        info.el.focus();
+      });
+    },
+
     eventMouseEnter: this.handleEventMouseEnter.bind(this),
     eventMouseLeave: this.handleEventMouseLeave.bind(this)
 
@@ -258,11 +300,18 @@ export class DashboardComponent implements OnInit {
       this.formueditar.get("actividad")?.setValue("0");
       this.formueditar.get("modalidad")?.setValue("0");
       this.formueditar.get("nombreasignador")?.setValue("0");
+
+      // Asegurarse de que el día puede recibir el foco
+      arg.dayEl.setAttribute('tabindex', '-1');
+
       this.modal5 = this._serviciomodal.open(this.modal4,{ centered: true, size: 'lg' });
       // este codigo esta atento al cierre del modal. de tal forma que inicializa variableas de validar muy importante.
       this.modal5.result.finally(() => {
         this.validoActividad = false;
         this.validoModalidad = false;
+
+        // Devolver el foco al día clicado
+        arg.dayEl.focus();
       });
 
     } else {
@@ -282,6 +331,7 @@ export class DashboardComponent implements OnInit {
 
       //this._router.navigate(['usuarios']);
       this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk")); ///SI PONGO ID USUARIO MUESTRA LO DEL USUARIO SI PONGO "SI" MUESTRA TODO
+      this.cargarTodosLosEventos();
       
       //llamos todos los usuarios registrados
       this._usuarios.cargausuarios(1,sessionStorage.getItem("tk")).subscribe(data=>{
@@ -294,7 +344,7 @@ export class DashboardComponent implements OnInit {
         const usuarioId1 = data.find((user:any) => user.usuarioid === this.idlogueado);
         this.nombrecompleto = usuarioId1 ? usuarioId1.nombrecompleto : '';
         this.apellidoscompleto = usuarioId1 ? usuarioId1.apellidocompleto : '';
-        console.log(data);
+        //console.log(data);
 
         this.pacientes= data;
       
@@ -302,7 +352,7 @@ export class DashboardComponent implements OnInit {
 
       //llamo el combobox de empresas para que se cargue una sola vez al iniciar la aplicacion
       this._compania.cargacompanias("si",1,sessionStorage.getItem("tk")).subscribe(data=>{
-        console.log(data);
+        //console.log(data);
         this.companias= data;
       
       });
@@ -323,6 +373,11 @@ export class DashboardComponent implements OnInit {
 
     this.idevento = info.event.id;
     this.tituloevento = info.event.title;
+    this.contratante = info.event.extendedProps.contratante ? info.event.extendedProps.contratante : "No Dato";
+    this.actividad = info.event.extendedProps.actividad ;
+    this.modalidad = info.event.extendedProps.modalidad ;
+    this.contacto = info.event.extendedProps.contacto ? info.event.extendedProps.contacto : "No Dato";
+    this.direccion = info.event.extendedProps.direccion ? info.event.extendedProps.direccion : "No Dato";
     this.startevento = this.formatTime(info.event.start);
     this.endevento = info.event.end ? this.formatTime(info.event.end) : '11:59 p.m.'; // Manejo de evento sin hora de fin
     this.starmilitar = this.formatTime2(info.event.start);
@@ -333,7 +388,7 @@ export class DashboardComponent implements OnInit {
     this.usuarioevento = info.event.extendedProps.userId;
     this.quienasigno = info.event.extendedProps.asignado;
     this.todoeldia = info.event.allDay;
-    //console.log("todo el dia :"+this.quienasigno);
+    //console.log("todo el dia :"+this.contratante);
 
     this.modal0 = this._serviciomodal.open(content,{ centered: true, size: 'lg' });
     //alert(`Evento: ${info.event.title}\nDescripción: ${info.event.extendedProps.description}`);
@@ -394,7 +449,7 @@ export class DashboardComponent implements OnInit {
   handleEventMouseEnter(info: any) {
 
     if (!info.el) {
-      console.error('Element not found for the event');
+      //console.error('Element not found for the event');
       return;
     }
 
@@ -488,6 +543,11 @@ export class DashboardComponent implements OnInit {
     this.formueditar.patchValue({
 
       'titulo':this.tituloevento,
+      'contratante':this.contratante,
+      'actividad':this.actividad,
+      'modalidad':this.modalidad,
+      'contacto':this.contacto,
+      'direccion':this.direccion,
       'finicial': this.fechainicial,
       'ffinal': this.fechafinal,
       'hinicial': this.starmilitar,
@@ -501,7 +561,7 @@ export class DashboardComponent implements OnInit {
     })
 
     
-    this.modal2 = this._serviciomodal.open(content,{ centered: true });
+    this.modal2 = this._serviciomodal.open(content,{ centered: true, size: 'lg' });
 
   }
 
@@ -513,14 +573,20 @@ export class DashboardComponent implements OnInit {
   }
   
   guardar(){
-    this._calendario.editarevento(2,1,this.idevento,this.formueditar.value.titulo,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,this.formueditar.value.descripcion,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
-      //console.log(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
+    
+    this._calendario.editarevento(2,1,this.idevento,this.formueditar.value.titulo,this.formueditar.value.contratante,this.formueditar.value.actividad,this.formueditar.value.modalidad,this.formueditar.value.contacto,this.formueditar.value.direccion,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,this.formueditar.value.descripcion,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
+       //console.log(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
     });
 
-    this.eventoactualdioclic.setProp('title', this.formueditar.value.titulo);
+    this.eventoactualdioclic.setProp('title', this.formueditar.value.titulo ? this.formueditar.value.titulo.toUpperCase() : 'SIN TITULO');
     this.eventoactualdioclic.setStart(this.formueditar.value.finicial+'T'+this.formueditar.value.hinicial+':00');
     this.eventoactualdioclic.setEnd(this.formueditar.value.ffinal+'T'+this.formueditar.value.hfinal+':00');
-    this.eventoactualdioclic.setExtendedProp('description', this.formueditar.value.descripcion);
+    this.eventoactualdioclic.setExtendedProp('contratante', this.formueditar.value.contratante ? this.formueditar.value.contratante.toUpperCase() : '');
+    this.eventoactualdioclic.setExtendedProp('actividad', this.formueditar.value.actividad );
+    this.eventoactualdioclic.setExtendedProp('modalidad', this.formueditar.value.modalidad );
+    this.eventoactualdioclic.setExtendedProp('contacto', this.formueditar.value.contacto ? this.formueditar.value.contacto.toUpperCase() : '');
+    this.eventoactualdioclic.setExtendedProp('direccion', this.formueditar.value.direccion ? this.formueditar.value.direccion : '');
+    this.eventoactualdioclic.setExtendedProp('description', this.formueditar.value.descripcion ? this.formueditar.value.descripcion.toUpperCase() : '');
 
     this.modal2?.dismiss();
     this.modal0?.dismiss();
@@ -565,7 +631,22 @@ export class DashboardComponent implements OnInit {
 
     }else{ // si el formulario se llena correctamente puede ingresar a crear el evento
 
-      console.log("Valoe del select "+ this.formueditar.value.nombreasignador);
+      const nuevoEvento = {
+        start: this.formueditar.value.finicial + 'T' + this.formueditar.value.hinicial + ':00',
+        end: this.formueditar.value.ffinal + 'T' + this.formueditar.value.hfinal + ':00',
+        allDay: false
+      };
+
+      // Validar solapamiento y pertenencia antes de crear el evento
+      if (this.validarSolapamientoIndividual(nuevoEvento)) {
+          this._serviciomodal.open(this.modal6,{ centered: true, size: 'sm' });
+          //console.error('Ya existe un evento en este rango de horas para uno de los usuarios seleccionados.',this.usuariosolapado);
+          return;
+      }
+
+
+
+      //console.log("Valoe del select "+ this.formueditar.value.nombreasignador);
       // console.log( "halassssssssssssssssssss "+typeof sessionStorage.getItem("us"));
       if(this.formueditar.value.nombreasignador == "0" ){
 
@@ -574,7 +655,7 @@ export class DashboardComponent implements OnInit {
         color = sessionStorage.getItem("cl");
         bordecolor = sessionStorage.getItem("cl");
         colorfondo = sessionStorage.getItem("cl");
-        console.log("Entro 1");
+        //console.log("Entro 1");
 
       }else if(this.formueditar.value.nombreasignador == ""){ /// la peticion de crear viene de un suario sin rol de administrador crea evento en su propio calendario
         
@@ -584,7 +665,7 @@ export class DashboardComponent implements OnInit {
         color = "#fac307";
         bordecolor = "#fac307";
         colorfondo = "#fac307";
-        console.log("Entro 2");
+        //console.log("Entro 2");
 
       }else{ //esta peticion es la ultima y es del usuario que asigna a otra agenda
 
@@ -596,12 +677,12 @@ export class DashboardComponent implements OnInit {
           color = sessionStorage.getItem("cl");
           bordecolor = sessionStorage.getItem("cl");
           colorfondo = sessionStorage.getItem("cl");
-          console.log("Entro 3");
+          //console.log("Entro 3");
           //console.log(num);
 
           if(num == usuarioIDasignado ){
             usuarioIDasignado="";
-            console.log("Entro 4");
+            //console.log("Entro 4");
           }
 
           this._calendario.crearevento(3,1,this.formueditar.value.titulo,this.formueditar.value.contratante,this.formueditar.value.actividad,this.formueditar.value.modalidad,this.formueditar.value.contacto,this.formueditar.value.direccion,this.formueditar.value.finicial,this.formueditar.value.ffinal,this.formueditar.value.hinicial,this.formueditar.value.hfinal,usuarioID,usuarioIDasignado,this.formueditar.value.descripcion,color,sessionStorage.getItem("tk")).subscribe((events: any[]) => {
@@ -636,14 +717,14 @@ export class DashboardComponent implements OnInit {
         backgroundColor: colorfondo 
       });
 
-      console.log(this.vistatotal);
+      //console.log(this.vistatotal);
       setTimeout(() => {
         if (this.vistatotal === 'no'){
           this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
-          console.log("Entro vistatotal NO");
+          //console.log("Entro vistatotal NO");
         }else{
           this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
-          console.log("Entro vistatotal SI");
+          //console.log("Entro vistatotal SI");
         }
       }, 3000);
 
@@ -659,16 +740,16 @@ export class DashboardComponent implements OnInit {
 
   toggleVista(): void {
     //this.vistatotal = this.vistatotal === 'no' ? 'si' : 'no';
-    console.log(this.vistatotal);
+    //console.log(this.vistatotal);
     
       if (this.vistatotal === 'no'){
         this.vistatotal = "si";
         this.cargareventos(1,1,"si",sessionStorage.getItem("tk"));
-        console.log('ENTRO NO');
+        //console.log('ENTRO NO');
       }else{
         this.vistatotal = "no";
         this.cargareventos(1,1,sessionStorage.getItem("us"),sessionStorage.getItem("tk"));
-        console.log('ENTRO SI');
+        //console.log('ENTRO SI');
       }
 
     }
@@ -689,10 +770,10 @@ export class DashboardComponent implements OnInit {
       // Buscar el nombre completo del paciente correspondiente al usuarioid seleccionado
       const selectedPaciente = this.pacientes.find((paciente:any) => paciente.usuarioid === selectedValue);
       if (selectedPaciente) {
-        //const nombreCompleto = `${selectedPaciente.nombrecompleto} ${selectedPaciente.apellidocompleto}`;
-        const nombreCompleto = `${selectedPaciente.nombrecompleto}`;
+        const nombreCompleto = `${selectedPaciente.nombrecompleto} ${selectedPaciente.apellidocompleto}`;
+        //const nombreCompleto = `${selectedPaciente.nombrecompleto}`;
         this.selectedNames.push(nombreCompleto);
-        //console.log('Nombres seleccionados:', this.selectedNames);
+        //console.log('Nombres seleccionados:', this.selectedValues);
       }
   
       //console.log('Valores seleccionados:', this.selectedValues); // Mostrar el array en la consola
@@ -707,6 +788,101 @@ export class DashboardComponent implements OnInit {
       //console.log('Nuevo array de valores seleccionados:', this.selectedValues);
     }
 
+    actividadTexto(valor: any): string {
+      let va: string;
+    
+      switch (valor) {
+        case "0":
+          va = "No Dato";
+          break;
+        case "1":
+          va = "Asesoría";
+          break;
+        case "2":
+          va = "Campaña";
+          break;
+        case "3":
+          va = "Capacitación";
+          break;
+        case "4":
+          va = "Reunión";
+          break;
+        case "5":
+          va = "RTAT";
+          break;
+        case "6":
+          va = "Trabajo de campo";
+          break;
+        case "7":
+          va = "Actividad de oficina";
+          break;
+        default:
+          va = "Desconocido";  // Para manejar casos que no están definidos
+          break;
+      }
+    
+      return va;
+    }
+    
+    modalidadTexto(valor: any): string {
+      let va: string;
+    
+      switch (valor) {
+        case "0":
+          va = "No Dato";
+          break;
+        case "1":
+          va = "Presencial";
+          break;
+        case "2":
+          va = "Virtual";
+          break;
+        default:
+          va = "Desconocido";  // Para manejar casos que no están definidos
+          break;
+      }
+    
+      return va;
+    }
+
+    validarSolapamientoIndividual(nuevoEvento: any): boolean {
+      const eventosExistentes = this.todosLosEventos as any[];
+    
+      //console.log('Eventos existentes en el calendario:', eventosExistentes);
+      if (this.selectedNames.length === 0) {
+
+        let nombris = this.nombrecompleto+" "+this.apellidoscompleto;
+        for (let evento of eventosExistentes) {
+          // Verificar si hay solapamiento y si el evento pertenece a uno de los `nombreasignador` en `selectedValues`
+          if (this.isOverlapping(new Date(nuevoEvento.start), new Date(nuevoEvento.end), new Date(evento.start), new Date(evento.end)) && nombris == evento.userId ) {
+              this.usuariosolapado = evento.userId;
+              return true; // Hay un solapamiento y el evento pertenece a uno de los `nombreasignador` seleccionados
+          }
+        }
+
+      }else{
+
+        for (let evento of eventosExistentes) {
+          // Verificar si hay solapamiento y si el evento pertenece a uno de los `nombreasignador` en `selectedValues`
+          if (this.isOverlapping(new Date(nuevoEvento.start), new Date(nuevoEvento.end), new Date(evento.start), new Date(evento.end)) &&
+              this.selectedNames.includes(evento.userId)) {
+              this.usuariosolapado = evento.userId;
+              return true; // Hay un solapamiento y el evento pertenece a uno de los `nombreasignador` seleccionados
+          }
+        }
+
+      }
+      
+
+      return false; // No hay solapamiento o pertenece a otro usuario
+    }
+    
+    isOverlapping(start1: Date, end1: Date | null, start2: Date, end2: Date | null): boolean {
+        if (end1 === null) end1 = start1;
+        if (end2 === null) end2 = start2;
+    
+        return (start1 < end2 && end1 > start2);
+    }
 
 
 

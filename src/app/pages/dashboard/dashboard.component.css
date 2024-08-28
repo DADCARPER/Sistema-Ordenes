@@ -1,1 +1,10 @@
 /* Estilo para el input */
+.fc {
+    background-image: url('/assets/fodotransparente.png');
+    
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  
+  

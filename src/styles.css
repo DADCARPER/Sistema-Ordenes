@@ -75,3 +75,7 @@
 .fc-event:hover {
   color: #bebdbd; /* Cambia esto por el color que prefieras */
 }
+
+.fc-daygrid-block-event{
+  font-size: 10px;
+}

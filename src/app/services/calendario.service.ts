@@ -37,18 +37,23 @@ export class CalendarioService {
 
   }
 
-  editarevento(accion:any,numcalendario:any,ideditar:any,titulo:any,fechinicial:any,fechfinal:any,hinicial:any,hfinal:any,descripcion:any,token:any):Observable<any>{
+  editarevento(accion:any,numcalendario:any,ideditar:any,titulo:any,contratante:any,actividad:any,modalidad:any,contacto:any,direccion:any,fechinicial:any,fechfinal:any,hinicial:any,hfinal:any,descripcion:any,token:any):Observable<any>{
 
     const body = {
       accion, //  editar-> 2
       numcalendario, // 1 principal
       ideditar, // id del evento a editar
-      titulo,
+      titulo: titulo ? titulo.toUpperCase() : "SIN TITULO", // id del evento a crear
+      contratante: contratante.toUpperCase(),
+      actividad,
+      modalidad,
+      contacto: contacto.toUpperCase(),
+      direccion,
+      descripcion: descripcion.toUpperCase(),
       fechinicial,
       fechfinal,
       hinicial,
       hfinal,
-      descripcion,
       token
     }
     //console.log(body);
@@ -61,11 +66,11 @@ export class CalendarioService {
     const body = {
       accion, // nuevo -> 3
       numcalendario, // 1 principal
-      titulo: titulo.toUpperCase(), // id del evento a crear
-      contratante: contratante.toUpperCase(),
+      titulo: titulo ? titulo.toUpperCase() : "SIN TITULO", // id del evento a crear
+      contratante: contratante ? contratante.toUpperCase() : contratante,
       actividad,
       modalidad,
-      contacto: contacto.toUpperCase(),
+      contacto: contacto ? contacto.toUpperCase(): contacto,
       direccion,
       descripcion: descripcion.toUpperCase(),
       fechinicial,
